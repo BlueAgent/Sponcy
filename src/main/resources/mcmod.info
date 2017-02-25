@@ -1,15 +1,15 @@
 [
 {
-  "modid": "examplemod",
-  "name": "Example Mod",
-  "description": "Example placeholder mod.",
+  "modid": "spontaneouscollection",
+  "name": "Spontaneous Collection",
+  "description": "For learning how to mod Minecraft, and for testing new ideas.",
   "version": "${version}",
   "mcversion": "${mcversion}",
-  "url": "",
+  "url": "https://github.com/BlueAgent/Spontaneous-Collection",
   "updateUrl": "",
-  "authorList": ["ExampleDude"],
-  "credits": "The Forge and FML guys, for making this example",
-  "logoFile": "",
+  "authorList": ["BlueAgent"],
+  "credits": "Mojang for Minecraft. Forge Team for Minecraft Forge.",
+  "logoFile": "assets/spontaneouscollection/logo.png",
   "screenshots": [],
   "dependencies": []
 }
