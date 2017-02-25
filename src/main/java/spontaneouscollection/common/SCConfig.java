@@ -1,4 +1,4 @@
-package spontaneouscollection;
+package spontaneouscollection.common;
 
 public class SCConfig {
     public static final String MODID = "spontaneouscollection";

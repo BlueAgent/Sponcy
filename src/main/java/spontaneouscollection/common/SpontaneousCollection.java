@@ -1,4 +1,4 @@
-package spontaneouscollection;
+package spontaneouscollection.common;
 
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
