@@ -12,17 +12,12 @@ import java.lang.reflect.Field;
 public class ClientProxy extends CommonProxy {
 
     @Override
-    public void registerModels(ModelRegistryEvent event)
-    {
-        for (Field f : SpontaneousCollection.Items.class.getDeclaredFields())
-        {
-            try
-            {
-                Item item = (Item)f.get(null);
+    public void registerModels(ModelRegistryEvent event) {
+        for (Field f : SpontaneousCollection.Items.class.getDeclaredFields()) {
+            try {
+                Item item = (Item) f.get(null);
                 ModelLoader.setCustomModelResourceLocation(item, 0, new ModelResourceLocation(item.getRegistryName(), "inventory"));
-            }
-            catch (IllegalAccessException e)
-            {
+            } catch (IllegalAccessException e) {
 
             }
         }

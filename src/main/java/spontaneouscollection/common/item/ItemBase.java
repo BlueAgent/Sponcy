@@ -9,11 +9,9 @@ public abstract class ItemBase extends Item {
     public static final String ITEM_PREFIX = "Item";
     public static final int ITEM_PREFIX_LENGTH = ITEM_PREFIX.length();
 
-    public ItemBase()
-    {
+    public ItemBase() {
         String name = this.getClass().getSimpleName();
-        if(name.startsWith(ITEM_PREFIX))
-        {
+        if (name.startsWith(ITEM_PREFIX)) {
             name = name.substring(ITEM_PREFIX_LENGTH);
         } else {
             throw new RuntimeException(String.format("Sub-class name does not start with 'Item': %s", name));
