@@ -10,7 +10,6 @@ import net.minecraftforge.fml.common.Mod.Instance;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.registry.GameRegistry.ObjectHolder;
 import spontaneouscollection.common.CommonProxy;
 
 @Mod(
@@ -52,18 +51,7 @@ public class SpontaneousCollection {
 
     @EventHandler
     public void init(FMLInitializationEvent event) {
-        System.out.println("Hello World!!!");
         System.out.println(String.format("Mod ID: %s", MODID));
         System.out.println(String.format("Version: %s", VERSION));
-    }
-
-    @ObjectHolder(MODID)
-    public static class Blocks {
-
-    }
-
-    @ObjectHolder(MODID)
-    public static class Items {
-        public static final Item mending_charm = null;
     }
 }
