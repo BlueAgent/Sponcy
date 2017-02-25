@@ -14,13 +14,10 @@ import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.registry.GameRegistry.ObjectHolder;
-import net.minecraftforge.fml.relauncher.SideOnly;
 import spontaneouscollection.common.CommonProxy;
 import spontaneouscollection.common.item.ItemMendingCharm;
 
 import java.lang.reflect.Field;
-
-import static net.minecraftforge.fml.relauncher.Side.CLIENT;
 
 @Mod(
     modid = SpontaneousCollection.MODID,
@@ -65,26 +62,20 @@ public class SpontaneousCollection {
     public static void registerBlocks(RegistryEvent.Register<Block> event)
     {
         System.out.println("Register blocks...");
-        //Soon...
+        proxy.registerBlocks(event);
     }
 
     @SubscribeEvent
     public static void registerItems(RegistryEvent.Register<Item> event)
     {
         System.out.println("Register items...");
-        event.getRegistry().registerAll(
-            new ItemMendingCharm().setRegistryName(MODID, "mending_charm").setUnlocalizedName("mending_charm").setCreativeTab(CreativeTabs.TOOLS)
-        );
+        proxy.registerItems(event);
     }
 
     @SubscribeEvent
-    @SideOnly(CLIENT)
     public static void registerModels(ModelRegistryEvent event) throws Exception
     {
-        for (Field f : Items.class.getDeclaredFields())
-        {
-            Item item = (Item)f.get(null);
-            ModelLoader.setCustomModelResourceLocation(item, 0, new ModelResourceLocation(item.getRegistryName(), "inventory"));
-        }
+        System.out.println("Register models...");
+        proxy.registerModels(event);
     }
 }
