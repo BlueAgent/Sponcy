@@ -9,6 +9,8 @@ import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.Mod.Instance;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import spontaneouscollection.common.CommonProxy;
 
@@ -50,8 +52,19 @@ public class SpontaneousCollection {
     }
 
     @EventHandler
-    public void init(FMLInitializationEvent event) {
+    public void preInit(FMLPreInitializationEvent event) {
         System.out.println(String.format("Mod ID: %s", MODID));
         System.out.println(String.format("Version: %s", VERSION));
+        proxy.preInit(event);
+    }
+
+    @EventHandler
+    public void init(FMLInitializationEvent event) {
+        proxy.init(event);
+    }
+
+    @EventHandler
+    public void postInit(FMLPostInitializationEvent event) {
+        proxy.postInit(event);
     }
 }

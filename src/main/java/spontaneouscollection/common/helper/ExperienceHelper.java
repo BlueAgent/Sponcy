@@ -13,19 +13,8 @@ public class ExperienceHelper {
     public static final int TYPICAL_LEVEL = 3000;
     public static final int TYPICAL_LEVEL_XP = xpAtLevel(3000); //40014720
 
-    //From private EntityXPOrb
-    public static int durabilityToXp(int durability) {
-        return durability / 2;
-    }
-
-    //From private EntityXPOrb
-    public static int xpToDurability(int xp) {
-        return xp * 2;
-    }
-
-
     /**
-     * Adds or removes experience from the player, checking bounds
+     * Adds or removes experience from the player, checks bounds.
      *
      * @param player to add or take exp from.
      * @param amount positive to add, negative to take.
@@ -49,7 +38,9 @@ public class ExperienceHelper {
 
     /**
      * Returns the total experience needed to reach the level.
-     * Calculated from summation of arithmetic series of {@see net.minecraft.entity.player.EntityPlayer.xpBarCap()}
+     * Calculated from summation of arithmetic series of {@see net.minecraft.entity.player.EntityPlayer#xpBarCap()}.
+     * Maximum level is 21863 with an experience of 2147407943.
+     * O(N)
      *
      * @param level to achieve.
      * @return experience to reach desired level.
@@ -102,7 +93,9 @@ public class ExperienceHelper {
     }
 
     /**
-     * Finds the level (truncated) that corresponds to the experience value
+     * Finds the level (truncated) that corresponds to the experience value.
+     * Maximum experience is 2147407943 with a level of 21863.
+     * O(log(N)): typically 12 (max 31) cycles to converge.
      *
      * @param xp
      * @return
