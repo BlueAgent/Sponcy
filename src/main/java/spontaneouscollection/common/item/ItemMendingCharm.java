@@ -44,6 +44,8 @@ public class ItemMendingCharm extends ItemBase {
         int repairRemaining = (int) getDurabilityFromXp(costHelp.getToMax()); //Should be equal to maxDurabilityRepaired
         if (repairRemaining <= 0) return;
         for (Slot slot : player.inventoryContainer.inventorySlots) {
+            //Exclude the crafting slots
+            if(slot.slotNumber < 5) continue;
             ItemStack itemStack = slot.getStack();
             if (itemStack == null) continue;
             if (!itemStack.isItemDamaged()) continue;
