@@ -25,9 +25,9 @@ import spontaneouscollection.common.CommonProxy;
 @Mod.EventBusSubscriber
 public class SpontaneousCollection {
     public static final String MODID = "spontaneouscollection";
-    public static final String VERSION = "1.0";
+    public static final String VERSION = "0.0.1";
 
-    @SidedProxy(clientSide = "spontaneouscollection.client.ClientProxy", serverSide = "spontaneouscollection.common.CommonProxy")
+    @SidedProxy(clientSide = "spontaneouscollection.client.ClientProxy", serverSide = "spontaneouscollection.server.ServerProxy")
     public static CommonProxy proxy;
 
     @Instance(MODID)
