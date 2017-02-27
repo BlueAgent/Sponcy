@@ -7,15 +7,26 @@ import static net.minecraftforge.common.config.Config.*;
 
 @Config(modid = SpontaneousCollection.MODID)
 public class SCConfig {
+    public static MendingCharm mending_charm;
 
-    @Comment("This test_general config should be inside the general category")
-    @RangeInt(min=1, max=200)
-    public static int test_general = 100;
+    public static class MendingCharm {
+        //TODO: Add a recipe, uses 4 items with mending on them
+        @Comment("Should the default recipe be added?")
+        public static boolean recipe = true;
 
-    @Comment("Comment on test_category does not work")
-    public static TestCategory test_category;
-    public static class TestCategory {
-        @Comment("This test_inside_category config should be inside the TestCategory category")
-        public static String test_inside_category = "Default String";
+        @Comment("Number of ticks per operation.")
+        @RangeInt(min = 1, max = 200)
+        public static int operation_time = 20;
+
+        @Comment("Total maximum durability per operation.")
+        @RangeInt(min = 1, max = 100000)
+        public static int max_durability = 10000;
+
+        @Comment("Amount of durability per experience point. Mending repairs 2 durability per experience point.")
+        @RangeDouble(min = 0.5, max = 10000)
+        public static int durability_per_xp = 2;
+
+        @Comment("Only repair items with Mending enchantment placed on.")
+        public static boolean requires_mending = true;
     }
 }

@@ -9,23 +9,26 @@ import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import spontaneouscollection.common.item.ItemMendingCharm;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public abstract class CommonProxy {
 
     public void registerBlocks(RegistryEvent.Register<Block> event) {
-        event.getRegistry().registerAll(
-        );
+        List<Block> reg = new ArrayList<>();
+        event.getRegistry().registerAll(reg.toArray(new Block[0]));
     }
 
     public void registerItems(RegistryEvent.Register<Item> event) {
-        event.getRegistry().registerAll(
-                new ItemMendingCharm()
-        );
+        List<Item> reg = new ArrayList<>();
+        if (SCConfig.mending_charm.enabled) reg.add(new ItemMendingCharm());
+        event.getRegistry().registerAll(reg.toArray(new Item[0]));
     }
 
     public abstract void registerModels(ModelRegistryEvent event);
 
     public void preInit(FMLPreInitializationEvent event) {
-        //TODO: Add configuration
+
     }
 
     public void init(FMLInitializationEvent event) {
