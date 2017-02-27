@@ -23,8 +23,8 @@ public class SCConfig {
         public static int max_durability = 10000;
 
         @Comment("Amount of durability per experience point. Mending repairs 2 durability per experience point.")
-        @RangeDouble(min = 0.5, max = 10000)
-        public static int durability_per_xp = 2;
+        @RangeDouble(min = 0.1, max = 10000)
+        public static double durability_per_xp = 2;
 
         @Comment("Only repair items with Mending enchantment placed on.")
         public static boolean requires_mending = true;
