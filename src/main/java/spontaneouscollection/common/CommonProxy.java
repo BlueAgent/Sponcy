@@ -1,13 +1,16 @@
 package spontaneouscollection.common;
 
 import net.minecraft.block.Block;
+import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 import spontaneouscollection.common.item.ItemMendingCharm;
+import spontaneouscollection.common.recipe.RecipeMendingCharm;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,7 +35,12 @@ public abstract class CommonProxy {
     }
 
     public void init(FMLInitializationEvent event) {
-
+        if (SCConfig.MendingCharm.recipe)
+            GameRegistry.addRecipe(new RecipeMendingCharm(
+                    Items.GOLD_INGOT,
+                    Items.GOLD_INGOT, Items.EMERALD, Items.GOLD_INGOT,
+                    Items.GOLD_INGOT
+            ));
     }
 
     public void postInit(FMLPostInitializationEvent event) {

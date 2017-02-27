@@ -10,7 +10,6 @@ public class SCConfig {
     public static MendingCharm mending_charm;
 
     public static class MendingCharm {
-        //TODO: Add a recipe, uses 4 items with mending on them
         @Comment("Should the default recipe be added?")
         public static boolean recipe = true;
 
@@ -28,5 +27,9 @@ public class SCConfig {
 
         @Comment("Only repair items with Mending enchantment placed on.")
         public static boolean requires_mending = true;
+
+        //TODO: Implement efficient repair
+        @Comment("[Not Implemented] Only repair item if it uses the xp to the fullest extent. This can leave items un repaired if they are not damaged enough.")
+        public static boolean repair_efficiently = false;
     }
 }

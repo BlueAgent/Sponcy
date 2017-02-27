@@ -45,9 +45,9 @@ public class ItemMendingCharm extends ItemBase {
         if (repairRemaining <= 0) return;
         for (Slot slot : player.inventoryContainer.inventorySlots) {
             //Exclude the crafting slots
-            if(slot.slotNumber < 5) continue;
+            if (slot.slotNumber < 5) continue;
             ItemStack itemStack = slot.getStack();
-            if (itemStack == null) continue;
+            if (itemStack == null) continue; //TODO: 1.11 update null check
             if (!itemStack.isItemDamaged()) continue;
             if (SCConfig.MendingCharm.requires_mending && EnchantmentHelper.getEnchantmentLevel(Enchantments.MENDING, itemStack) == 0)
                 continue;
