@@ -33,14 +33,15 @@ public class ItemMendingCharm extends ItemBase {
     @Override
     public void onUpdate(ItemStack stack, World worldIn, Entity entityIn, int itemSlot, boolean isSelected) {
         if (worldIn.isRemote) return;
-        if (worldIn.getTotalWorldTime() % SCConfig.MendingCharm.operation_time == 0) return;
+        if (worldIn.getTotalWorldTime() % SCConfig.MendingCharm.operation_time != 0) return;
         if (!(entityIn instanceof EntityPlayer)) return;
         EntityPlayer player = (EntityPlayer) entityIn;
 
         //Use doubles for fractional experience cost
         //Vanilla mending actually gives you a free repair when there's only 1 durability missing
-        CostHelper costHelp = new CostHelper(player.experienceTotal);
-        int repairRemaining = Math.min((int) getDurabilityFromXp(costHelp.getToMax()), MendingCharm.max_durability);
+        double maxDurabilityRepaired = Math.min(getDurabilityFromXp(player.experienceTotal), MendingCharm.max_durability);
+        CostHelper costHelp = new CostHelper(getXpFromDurability(maxDurabilityRepaired));
+        int repairRemaining = (int) getDurabilityFromXp(costHelp.getToMax()); //Should be equal to maxDurabilityRepaired
         if (repairRemaining <= 0) return;
         for (Slot slot : player.inventoryContainer.inventorySlots) {
             ItemStack itemStack = slot.getStack();

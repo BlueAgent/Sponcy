@@ -21,7 +21,7 @@ public abstract class CommonProxy {
 
     public void registerItems(RegistryEvent.Register<Item> event) {
         List<Item> reg = new ArrayList<>();
-        if (SCConfig.mending_charm.enabled) reg.add(new ItemMendingCharm());
+        reg.add(new ItemMendingCharm());
         event.getRegistry().registerAll(reg.toArray(new Item[0]));
     }
 
