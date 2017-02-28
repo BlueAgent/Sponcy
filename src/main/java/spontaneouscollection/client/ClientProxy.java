@@ -18,7 +18,6 @@ public class ClientProxy extends CommonProxy {
                 Item item = (Item) f.get(null);
                 ModelLoader.setCustomModelResourceLocation(item, 0, new ModelResourceLocation(item.getRegistryName(), "inventory"));
             } catch (IllegalAccessException e) {
-                //TODO: Add configuration to disable items and blocks (then it'll be normal to be missing)
                 throw new RuntimeException("Missing items", e);
             }
         }

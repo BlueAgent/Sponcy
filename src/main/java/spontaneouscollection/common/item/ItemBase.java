@@ -17,7 +17,7 @@ public abstract class ItemBase extends Item {
             throw new RuntimeException(String.format("Sub-class name does not start with 'Item': %s", name));
         }
         name = StringHelper.camelCaseToUnderscore(name);
-        this.setRegistryName(SpontaneousCollection.MODID, name);
+        this.setRegistryName(SpontaneousCollection.MOD_ID, name);
         this.setUnlocalizedName(name);
     }
 }

@@ -5,7 +5,7 @@ import spontaneouscollection.SpontaneousCollection;
 
 import static net.minecraftforge.common.config.Config.*;
 
-@Config(modid = SpontaneousCollection.MODID)
+@Config(modid = SpontaneousCollection.MOD_ID)
 public class SCConfig {
     public static MendingCharm mending_charm;
 

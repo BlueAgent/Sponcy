@@ -15,22 +15,25 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import spontaneouscollection.common.CommonProxy;
 
 @Mod(
-        modid = SpontaneousCollection.MODID,
+        modid = SpontaneousCollection.MOD_ID,
         name = "Spontaneous Collection",
-        version = SpontaneousCollection.VERSION,
+        version = SpontaneousCollection.MOD_VERSION,
+        acceptedMinecraftVersions = SpontaneousCollection.MC_VERSION,
         clientSideOnly = false,
         serverSideOnly = false,
-        dependencies = "required-after:Forge@[12.18.3.2185,)"
+        dependencies = SpontaneousCollection.DEPENDENCIES
 )
 @Mod.EventBusSubscriber
 public class SpontaneousCollection {
-    public static final String MODID = "spontaneouscollection";
-    public static final String VERSION = "0.0.2";
+    public static final String MOD_ID = "spontaneouscollection";
+    public static final String MOD_VERSION = "99999.999.999";
+    public static final String MC_VERSION = "";
+    public static final String DEPENDENCIES = "";
 
     @SidedProxy(clientSide = "spontaneouscollection.client.ClientProxy", serverSide = "spontaneouscollection.server.ServerProxy")
     public static CommonProxy proxy;
 
-    @Instance(MODID)
+    @Instance(MOD_ID)
     public static SpontaneousCollection INSTANCE;
 
     @SubscribeEvent
@@ -53,8 +56,8 @@ public class SpontaneousCollection {
 
     @EventHandler
     public void preInit(FMLPreInitializationEvent event) {
-        System.out.println(String.format("Mod ID: %s", MODID));
-        System.out.println(String.format("Version: %s", VERSION));
+        System.out.println(String.format("Mod ID: %s", MOD_ID));
+        System.out.println(String.format("Version: %s", MOD_VERSION));
         proxy.preInit(event);
     }
 
