@@ -74,14 +74,12 @@ public class ItemMendingCharm extends ItemBase {
         //Efficiency may cause it to round down to zero here
         if (xpRequired <= 0) return;
         CostHelper costHelper = new CostHelper(getDurabilityFromXp(xpRequired));
-        while (!queue.isEmpty()) {
+        while (!queue.isEmpty() && costHelper.getToMax() > 0) {
             //Dequeue
             ItemStack itemStack = queue.removeFirst();
             int toRepair = (int) Math.min(itemStack.getItemDamage(), costHelper.getToMax());
             if (costHelper.add(toRepair)) {
                 itemStack.setItemDamage(itemStack.getItemDamage() - toRepair);
-            } else {
-                break;
             }
         }
         ExperienceHelper.addXp(player, (int) -xpRequired);
