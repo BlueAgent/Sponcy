@@ -1,16 +1,18 @@
 package spontaneouscollection.common.item;
 
-import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Enchantments;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.World;
-import spontaneouscollection.common.SCConfig;
 import spontaneouscollection.common.SCConfig.MendingCharm;
 import spontaneouscollection.common.helper.CostHelper;
+import spontaneouscollection.common.helper.EnchantHelper;
 import spontaneouscollection.common.helper.ExperienceHelper;
+
+import java.util.LinkedList;
 
 
 /**
@@ -23,46 +25,69 @@ public class ItemMendingCharm extends ItemBase {
     }
 
     public static double getDurabilityFromXp(double experience) {
-        return experience * SCConfig.MendingCharm.durability_per_xp;
+        return experience * MendingCharm.durability_per_xp;
     }
 
     public static double getXpFromDurability(double durability) {
-        return durability / SCConfig.MendingCharm.durability_per_xp;
+        return durability / MendingCharm.durability_per_xp;
     }
 
     @Override
     public void onUpdate(ItemStack stack, World worldIn, Entity entityIn, int itemSlot, boolean isSelected) {
         if (worldIn.isRemote) return;
-        if (worldIn.getTotalWorldTime() % SCConfig.MendingCharm.operation_time != 0) return;
+        if (worldIn.getTotalWorldTime() % MendingCharm.operation_time != 0) return;
         if (!(entityIn instanceof EntityPlayer)) return;
         EntityPlayer player = (EntityPlayer) entityIn;
 
-        //Use doubles for fractional experience cost
-        //Vanilla mending actually gives you a free repair when there's only 1 durability missing
-        double maxDurabilityRepaired = Math.min(getDurabilityFromXp(player.experienceTotal), MendingCharm.max_durability);
-        CostHelper costHelp = new CostHelper(getXpFromDurability(maxDurabilityRepaired));
-        int repairRemaining = (int) getDurabilityFromXp(costHelp.getToMax()); //Should be equal to maxDurabilityRepaired
-        if (repairRemaining <= 0) return;
+        //Might have issues with floating point precision
+        //Is required for the floating point durability per xp though
+        double durabilityToRepair = 0;
+        double durabilityMaximum = Math.min(getDurabilityFromXp(player.experienceTotal), MendingCharm.max_durability);
+        if (durabilityMaximum <= 0) return;
+        //Find all items to repair
+        LinkedList<ItemStack> queue = new LinkedList<>();
         for (Slot slot : player.inventoryContainer.inventorySlots) {
+            //Stop searching after going over the limit
+            //Unless debug is on, in which case it checks all the items to find the actual durabilityToRepair
+            if (!MendingCharm.debug && durabilityToRepair >= durabilityMaximum)
+                break;
             //Exclude the crafting slots
             if (slot.slotNumber < 5) continue;
             ItemStack itemStack = slot.getStack();
             if (itemStack == null) continue; //TODO: 1.11 update null check
+            //Make sure it is using metadata for durability
             if (!itemStack.isItemDamaged()) continue;
-            if (SCConfig.MendingCharm.requires_mending && EnchantmentHelper.getEnchantmentLevel(Enchantments.MENDING, itemStack) == 0)
+            //Check if it has Mending
+            if (MendingCharm.requires_mending && EnchantHelper.getEnchantmentLevel(itemStack, Enchantments.MENDING) == 0)
                 continue;
-            int toRepair = Math.min(repairRemaining, itemStack.getItemDamage());
-            if (toRepair <= 0) continue;
-            if (costHelp.add(getXpFromDurability(toRepair))) {
+            //Enqueue
+            queue.addLast(itemStack);
+            durabilityToRepair += itemStack.getItemDamage();
+        }
+        if (durabilityToRepair >= durabilityMaximum)
+            durabilityToRepair = durabilityMaximum;
+        //Exit if there's nothing to repair
+        if (durabilityToRepair <= 0) return;
+        double xpRequired = getXpFromDurability(durabilityToRepair);
+        //Round based on efficiency config
+        xpRequired = MendingCharm.repair_efficiently ? Math.floor(xpRequired) : Math.ceil(xpRequired);
+        //Efficiency may cause it to round down to zero here
+        if (xpRequired <= 0) return;
+        CostHelper costHelper = new CostHelper(getDurabilityFromXp(xpRequired));
+        while (!queue.isEmpty()) {
+            //Dequeue
+            ItemStack itemStack = queue.removeFirst();
+            int toRepair = (int) Math.min(itemStack.getItemDamage(), costHelper.getToMax());
+            if (costHelper.add(toRepair)) {
                 itemStack.setItemDamage(itemStack.getItemDamage() - toRepair);
-                repairRemaining = (int) getDurabilityFromXp(costHelp.getToMax());
-                if (repairRemaining <= 0) break;
+            } else {
+                break;
             }
         }
-
-        int totalCost = (int) Math.ceil(costHelp.getTotal());
-        if (totalCost > 0) {
-            ExperienceHelper.addXp(player, -totalCost);
-        }
+        ExperienceHelper.addXp(player, (int) -xpRequired);
+        if (MendingCharm.debug)
+            player.addChatComponentMessage(new TextComponentString(
+                    String.format("%dxp => %d/%d", (int) xpRequired, (int) costHelper.getTotal(), (int) durabilityToRepair)
+            ));
     }
 }

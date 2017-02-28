@@ -9,17 +9,16 @@ public class CostHelper {
      * minCost must be less than or equal to maxCost (otherwise it will swap them).
      * totalCost is clamped between minCost and maxCost.
      *
-     * @param maxCost the maximum allowable cost.
-     * @param minCost the minimum allowable cost.
+     * @param maxCost   the maximum allowable cost.
+     * @param minCost   the minimum allowable cost.
      * @param totalCost this starting value of the cost.
      */
     public CostHelper(double maxCost, double minCost, double totalCost) {
         assert minCost <= maxCost;
-        if(minCost <= maxCost)
-        {
+        if (minCost <= maxCost) {
             this.maxCost = maxCost;
             this.minCost = minCost;
-        }else{
+        } else {
             this.maxCost = minCost;
             this.minCost = maxCost;
         }
@@ -77,11 +76,11 @@ public class CostHelper {
 
     /**
      * Set the cost clamped between max and min
+     *
      * @param cost to set.
      * @return this.
      */
-    public CostHelper set(double cost)
-    {
+    public CostHelper set(double cost) {
         totalCost = Math.max(minCost, Math.min(maxCost, cost));
         return this;
     }
