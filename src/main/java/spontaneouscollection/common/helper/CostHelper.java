@@ -6,24 +6,45 @@ public class CostHelper {
 
     /**
      * Helps add up costs.
-     * minCost must be less than or equal to maxCost (otherwise behaviour is undefined).
-     * totalCost is initialised to 0, clamped between minCost and maxCost.
+     * minCost must be less than or equal to maxCost (otherwise it will swap them).
+     * totalCost is clamped between minCost and maxCost.
      *
      * @param maxCost the maximum allowable cost.
      * @param minCost the minimum allowable cost.
+     * @param totalCost this starting value of the cost.
+     */
+    public CostHelper(double maxCost, double minCost, double totalCost) {
+        assert minCost <= maxCost;
+        if(minCost <= maxCost)
+        {
+            this.maxCost = maxCost;
+            this.minCost = minCost;
+        }else{
+            this.maxCost = minCost;
+            this.minCost = maxCost;
+        }
+        assert totalCost <= this.maxCost;
+        assert totalCost >= this.minCost;
+        this.totalCost = Math.max(this.minCost, Math.min(this.maxCost, totalCost));
+    }
+
+    /**
+     * Starting cost equal to minCost.
+     *
+     * @param maxCost the maximum allowable cost.
+     * @param minCost the minimum allowable cost.
+     * @see CostHelper#CostHelper(double, double, double)
      */
     public CostHelper(double maxCost, double minCost) {
-        this.maxCost = maxCost;
-        this.minCost = minCost;
-        assert this.minCost <= maxCost;
-        this.totalCost = Math.max(minCost, Math.min(maxCost, 0));
+        this(maxCost, minCost, minCost);
     }
 
     /**
      * Minimum cost of 0.
+     * Starting cost of 0.
      *
      * @param maxCost the maximum allowable cost.
-     * @see CostHelper#CostHelper(double, double)
+     * @see CostHelper#CostHelper(double, double, double)
      */
     public CostHelper(double maxCost) {
         this(maxCost, 0);
@@ -32,8 +53,9 @@ public class CostHelper {
     /**
      * Maximum cost of Double.MAX_VALUE.
      * Minimum cost of 0.
+     * Starting cost of 0.
      *
-     * @see CostHelper#CostHelper(double, double)
+     * @see CostHelper#CostHelper(double, double, double)
      */
     public CostHelper() {
         this(Double.MAX_VALUE);
@@ -49,8 +71,19 @@ public class CostHelper {
         double newCost = totalCost + cost;
         if (newCost > maxCost) return false;
         if (newCost < minCost) return false;
-        totalCost = cost;
+        totalCost = newCost;
         return true;
+    }
+
+    /**
+     * Set the cost clamped between max and min
+     * @param cost to set.
+     * @return this.
+     */
+    public CostHelper set(double cost)
+    {
+        totalCost = Math.max(minCost, Math.min(maxCost, cost));
+        return this;
     }
 
     public double getTotal() {
