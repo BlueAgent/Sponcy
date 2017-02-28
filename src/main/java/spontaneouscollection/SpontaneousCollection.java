@@ -13,6 +13,7 @@ import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import spontaneouscollection.common.CommonProxy;
+import spontaneouscollection.common.helper.SQLiteHelper;
 
 @Mod(
         modid = SpontaneousCollection.MOD_ID,
@@ -56,18 +57,21 @@ public class SpontaneousCollection {
 
     @EventHandler
     public void preInit(FMLPreInitializationEvent event) {
-        System.out.println(String.format("Mod ID: %s", MOD_ID));
-        System.out.println(String.format("Version: %s", MOD_VERSION));
+        System.out.println(String.format("Pre-Init %s", MOD_ID));
+        System.out.println(String.format("Version %s", MOD_VERSION));
+        System.out.println("Loaded SQLiteJDBC (by Taro L. Saito) with prefix set to: " + SQLiteHelper.PREFIX);
         proxy.preInit(event);
     }
 
     @EventHandler
     public void init(FMLInitializationEvent event) {
+        System.out.println(String.format("Init %s", MOD_ID));
         proxy.init(event);
     }
 
     @EventHandler
     public void postInit(FMLPostInitializationEvent event) {
+        System.out.println(String.format("Post-Init %s", MOD_ID));
         proxy.postInit(event);
     }
 }

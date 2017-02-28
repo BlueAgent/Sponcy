@@ -8,7 +8,7 @@
   "url": "https://github.com/BlueAgent/Spontaneous-Collection",
   "updateUrl": "",
   "authorList": ["BlueAgent"],
-  "credits": "Mojang for Minecraft. Forge Team for Minecraft Forge. AE2 Team, HellFirePVP, LexManos, Vazkii, WayOfTime for modding examples.",
+  "credits": "Mojang for Minecraft.\nForge Team for Minecraft Forge.\nAE2 Team, HellFirePVP, LexManos, Vazkii, WayOfTime, ShadowFacts for modding examples.\nSQLiteJDBC by Taro L. Saito.",
   "logoFile": "assets/spontaneouscollection/logo.png",
   "screenshots": [],
   "dependencies": []
