@@ -118,7 +118,7 @@ public class ShopHelper implements Closeable {
             }
             entry.getKey().interrupt();
         }
-        if(connectionCleanupThread.isAlive())
+        if (connectionCleanupThread.isAlive())
             connectionCleanupThread.interrupt();
     }
 

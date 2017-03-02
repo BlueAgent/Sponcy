@@ -12,6 +12,7 @@ import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.*;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import spontaneouscollection.common.CommonProxy;
+import spontaneouscollection.common.helper.LangHelper;
 import spontaneouscollection.common.helper.SQLiteHelper;
 
 @Mod(
@@ -33,9 +34,15 @@ public class SpontaneousCollection {
 
     @SidedProxy(clientSide = "spontaneouscollection.client.ClientProxy", serverSide = "spontaneouscollection.server.ServerProxy")
     public static CommonProxy proxy;
+    public static LangHelper lang = new LangHelper(SpontaneousCollection.MOD_ID + ".");
 
     @Instance(MOD_ID)
     public static SpontaneousCollection INSTANCE;
+
+    @SubscribeEvent
+    public static void resisterRegistries(RegistryEvent.NewRegistry event) {
+
+    }
 
     @SubscribeEvent
     public static void registerBlocks(RegistryEvent.Register<Block> event) {

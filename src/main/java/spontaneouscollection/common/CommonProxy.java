@@ -9,6 +9,7 @@ import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.event.*;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import spontaneouscollection.SpontaneousCollection;
+import spontaneouscollection.common.command.Commands;
 import spontaneouscollection.common.helper.ShopHelper;
 import spontaneouscollection.common.item.ItemMendingCharm;
 import spontaneouscollection.common.recipe.RecipeMendingCharm;
@@ -52,6 +53,9 @@ public abstract class CommonProxy {
     }
 
     public void serverStarting(FMLServerStartingEvent event) {
+        Commands.getCommands(Commands.class).forEach(event::registerServerCommand);
+        System.out.println("commands registered");
+
         shops = new ShopHelper();
         try {
             shops.createTables();
