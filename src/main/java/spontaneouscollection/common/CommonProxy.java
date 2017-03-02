@@ -5,17 +5,21 @@ import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.event.RegistryEvent;
-import net.minecraftforge.fml.common.event.FMLInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.event.world.WorldEvent;
+import net.minecraftforge.fml.common.event.*;
 import net.minecraftforge.fml.common.registry.GameRegistry;
+import spontaneouscollection.SpontaneousCollection;
+import spontaneouscollection.common.helper.ShopHelper;
 import spontaneouscollection.common.item.ItemMendingCharm;
 import spontaneouscollection.common.recipe.RecipeMendingCharm;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
 public abstract class CommonProxy {
+
+    public ShopHelper shops = null;
 
     public void registerBlocks(RegistryEvent.Register<Block> event) {
         List<Block> reg = new ArrayList<>();
@@ -44,6 +48,38 @@ public abstract class CommonProxy {
     }
 
     public void postInit(FMLPostInitializationEvent event) {
+
+    }
+
+    public void serverStarting(FMLServerStartingEvent event) {
+        shops = new ShopHelper();
+        try {
+            shops.createTables();
+            System.out.println("shops initialised");
+        } catch (SQLException e) {
+            RuntimeException re = new RuntimeException("Failed to create shops database", e);
+            if (SpontaneousCollection.DEV_ENVIRONMENT)
+                re.printStackTrace();
+            else
+                throw re;
+        }
+    }
+
+    public void serverStopping(FMLServerStoppingEvent event) {
+        System.out.println("shops closing all connections...");
+        shops.close();
+        System.out.println("shops closed");
+    }
+
+    public void onWorldLoad(WorldEvent.Load event) {
+
+    }
+
+    public void onWorldUnload(WorldEvent.Unload event) {
+
+    }
+
+    public void onWorldSave(WorldEvent.Save event) {
 
     }
 }

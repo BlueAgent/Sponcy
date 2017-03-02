@@ -15,9 +15,9 @@ import spontaneouscollection.common.SCConfig.MendingCharm;
 import spontaneouscollection.common.helper.CostHelper;
 import spontaneouscollection.common.helper.EnchantHelper;
 import spontaneouscollection.common.helper.ExperienceHelper;
-import spontaneouscollection.common.helper.SyncHelper;
 
 import java.util.LinkedList;
+import java.util.UUID;
 
 
 /**
@@ -96,11 +96,7 @@ public class ItemMendingCharm extends ItemBase {
 
     @Override
     public EnumActionResult onItemUse(ItemStack stack, EntityPlayer playerIn, World worldIn, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
-        System.out.println("World");
-        //TODO: Remove Debug
-        SyncHelper.addScheduledTask(worldIn, () -> {
-            System.out.println("Test");
-        });
+        System.out.println(UUID.randomUUID());
         return EnumActionResult.SUCCESS;
     }
 }

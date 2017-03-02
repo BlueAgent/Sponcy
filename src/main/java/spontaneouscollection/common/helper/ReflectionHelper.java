@@ -21,6 +21,6 @@ public class ReflectionHelper {
     }
 
     public static void makeFinalAccessible(Field f) throws IllegalAccessException {
-        f.setInt(f, f.getModifiers() & ~Modifier.FINAL);
+        modifiersField.setInt(f, f.getModifiers() & ~Modifier.FINAL);
     }
 }

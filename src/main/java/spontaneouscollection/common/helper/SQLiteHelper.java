@@ -2,28 +2,33 @@ package spontaneouscollection.common.helper;
 
 import net.minecraftforge.common.DimensionManager;
 import org.sqlite.JDBC;
-import spontaneouscollection.SpontaneousCollection;
+import org.sqlite.SQLiteConnection;
 
 import java.io.File;
-import java.lang.reflect.Field;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
+import java.sql.*;
+import java.util.Enumeration;
 
 public class SQLiteHelper {
-    public static final String PREFIX = "jdbc:sqlite:" + SpontaneousCollection.MOD_ID + ":";
-
     static {
         try {
-            Field f = JDBC.class.getDeclaredField("PREFIX");
-            f.setAccessible(true);
-            ReflectionHelper.makeFinalAccessible(f);
-            f.set(null, PREFIX);
-        } catch (IllegalAccessException e) {
+            //Registered drivers of the shaded class
+            //This is so other people using the sqlite library don't conflict
+            Class.forName(JDBC.class.getName());
+            Enumeration<Driver> e = DriverManager.getDrivers();
+            while (e.hasMoreElements()) {
+                Driver d = e.nextElement();
+                if (JDBC.class == d.getClass())
+                    DriverManager.deregisterDriver(d);
+            }
+        } catch (SQLException e) {
             e.printStackTrace();
-        } catch (NoSuchFieldException e) {
+        } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
+    }
+
+    public static String load() {
+        return JDBC.class.getName();
     }
 
     /**
@@ -32,13 +37,18 @@ public class SQLiteHelper {
      * @param path to database.
      * @return Connection opened.
      */
-    public static Connection connect(File path) {
-        String url = PREFIX + path.getAbsolutePath();
-        try {
-            return DriverManager.getConnection(url);
-        } catch (SQLException e) {
-            throw new RuntimeException("Failed to connect to database at: " + url, e);
-        }
+    public static SQLiteConnection connect(String path) throws SQLException {
+        return new SQLiteConnection(JDBC.PREFIX + path, path);
+    }
+
+    /**
+     * Connects to a database.
+     *
+     * @param path to database.
+     * @return Connection opened.
+     */
+    public static SQLiteConnection connect(File path) throws SQLException {
+        return connect(path.getAbsolutePath());
     }
 
     /**
@@ -50,11 +60,18 @@ public class SQLiteHelper {
      * @param databaseName name of the database file.
      * @return Connection
      */
-    public static Connection connect(String modID, String databaseName) {
+    public static SQLiteConnection connect(String modID, String databaseName) throws SQLException {
         File saveDirectory = DimensionManager.getCurrentSaveRootDirectory();
         if (modID != null && modID.length() > 0)
             saveDirectory = new File(saveDirectory, modID);
         saveDirectory.mkdirs();
-        return connect(new File(saveDirectory, databaseName + ".db"));
+        return connect(new File(saveDirectory, databaseName));
+    }
+
+    public static void execute(Connection conn, String sql) throws SQLException {
+        try (Statement s = conn.createStatement()) {
+            s.execute(sql);
+        }
+        conn.commit();
     }
 }
