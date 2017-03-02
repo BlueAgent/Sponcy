@@ -5,7 +5,6 @@ import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.server.MinecraftServer;
-import spontaneouscollection.SpontaneousCollection;
 import spontaneouscollection.common.helper.LangHelper;
 
 import java.lang.annotation.*;
@@ -15,10 +14,10 @@ import java.lang.reflect.Modifier;
 import java.util.LinkedList;
 import java.util.List;
 
-@Commands.CommandHolder("command.")
+@Commands.CommandHolder("commands.")
 public class Commands {
-    public static final String COMMAND_EXCEPTION = "command.exception";
-    public static final LangHelper lang = new LangHelper("command.");
+    public static final String COMMAND_EXCEPTION = "commands.exception";
+    public static final LangHelper lang = new LangHelper("commands.");
 
     @Command
     public static void sc_test(MinecraftServer server, ICommandSender sender, String[] args) {

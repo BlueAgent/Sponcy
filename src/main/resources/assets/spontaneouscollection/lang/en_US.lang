@@ -1,10 +1,10 @@
 #Commands
-command.exception=[%s] %s
-command.sc_test=A test command.
-command.sc_test.message="Hello, your friendly neighbourhood cheesecake here!"
-command.sc_error=Test command exception
-command.sc_error.error=ERROR TEST BEEP BOOP!!!!!
-command.sc_exception=Test general exception
+commands.exception=[%s] %s
+commands.sc_test=A test command.
+commands.sc_test.message="Hello, your friendly neighbourhood cheesecake here!"
+commands.sc_error=Test command exception
+commands.sc_error.error=ERROR TEST BEEP BOOP!!!!!
+commands.sc_exception=Test general exception
 
 #Items
 item.mending_charm.name=Mending Charm
