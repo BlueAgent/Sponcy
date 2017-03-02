@@ -14,12 +14,12 @@ public class SCConfig {
         public static boolean recipe = true;
 
         @Comment("Number of ticks per operation.")
-        @RangeInt(min = 1, max = 200)
-        public static int operation_time = 200;
+        @RangeInt(min = 1, max = 60*20)
+        public static int operation_time = 5*20;
 
         @Comment("Total maximum durability per operation.\nMake sure this is greater than 'durability_per_xp' if 'repair_efficiently = true' or it will never repair anything.")
         @RangeInt(min = 1, max = 1000000)
-        public static int max_durability = 100000;
+        public static int max_durability = 10000;
 
         @Comment("Amount of durability per experience point.\nVanilla Mending repairs 2 durability per experience point.")
         @RangeDouble(min = 0.1, max = 10000)

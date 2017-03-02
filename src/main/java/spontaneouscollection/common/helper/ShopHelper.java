@@ -116,7 +116,10 @@ public class ShopHelper implements Closeable {
             } catch (SQLException e) {
                 new RuntimeException("Failed to close connection for thread: " + entry.getKey().getName(), e).printStackTrace();
             }
+            entry.getKey().interrupt();
         }
+        if(connectionCleanupThread.isAlive())
+            connectionCleanupThread.interrupt();
     }
 
     public void execute(String sql) throws SQLException {
