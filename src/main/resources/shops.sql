@@ -1,11 +1,11 @@
-CREATE TABLE IF NOT EXISTS 'ShopOwner' (
+CREATE TABLE IF NOT EXISTS 'shop_owner' (
 	`id`	INTEGER NOT NULL,
 	`uuid`	TEXT NOT NULL UNIQUE,
 	`name`	TEXT NOT NULL,
 	`money`	INTEGER NOT NULL DEFAULT 0 CHECK(money >= 0),
 	PRIMARY KEY(`id`)
 );
-CREATE TABLE IF NOT EXISTS 'ShopItem' (
+CREATE TABLE IF NOT EXISTS 'shop_item' (
 	`id`	INTEGER NOT NULL,
 	`owner`	INTEGER NOT NULL,
 	`item_id`	TEXT NOT NULL,
@@ -13,31 +13,31 @@ CREATE TABLE IF NOT EXISTS 'ShopItem' (
 	`nbt`	BLOB,
 	`amount`	INTEGER NOT NULL DEFAULT 0 CHECK(amount >= 0),
 	PRIMARY KEY(`id`),
-	FOREIGN KEY(`owner`) REFERENCES `ShopOwner.id`
+	FOREIGN KEY(`owner`) REFERENCES `shop_owner.id`
 );
-CREATE TABLE IF NOT EXISTS 'ShopShop' (
+CREATE TABLE IF NOT EXISTS 'shop_shop' (
 	`id`	INTEGER NOT NULL,
 	`owner`	INTEGER NOT NULL,
 	`money`	INTEGER NOT NULL DEFAULT 0 CHECK(money >= 0),
 	`name`	TEXT NOT NULL DEFAULT '',
 	`description`	INTEGER NOT NULL DEFAULT '',
 	PRIMARY KEY(`id`)
-    FOREIGN KEY(`owner`) REFERENCES `ShopOwner.id`
+    FOREIGN KEY(`owner`) REFERENCES `shop_owner.id`
 );
-CREATE TABLE IF NOT EXISTS 'ShopOffer' (
+CREATE TABLE IF NOT EXISTS 'shop_offer' (
 	`id`	INTEGER NOT NULL,
 	`shop`	INTEGER NOT NULL,
 	`money`	INTEGER NOT NULL DEFAULT 0,
 	`description`	TEXT NOT NULL DEFAULT '',
 	PRIMARY KEY(`id`)
-    FOREIGN KEY(`shop`) REFERENCES `ShopShop.id`
+    FOREIGN KEY(`shop`) REFERENCES `shop_shop.id`
 );
-CREATE TABLE IF NOT EXISTS 'ShopOfferItems' (
+CREATE TABLE IF NOT EXISTS 'shop_offer_items' (
 	`id`	INTEGER NOT NULL,
 	`offer`	INTEGER NOT NULL,
 	`item`	INTEGER NOT NULL,
 	`amount`	INTEGER NOT NULL DEFAULT 0 CHECK(amount != 0),
 	PRIMARY KEY(`id`)
-    FOREIGN KEY(`offer`) REFERENCES `ShopOffer.id`
-    FOREIGN KEY(`item`) REFERENCES `ShopItem.id`
+    FOREIGN KEY(`offer`) REFERENCES `shop_offer.id`
+    FOREIGN KEY(`item`) REFERENCES `shop_item.id`
 );

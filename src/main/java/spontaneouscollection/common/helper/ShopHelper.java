@@ -23,6 +23,15 @@ public class ShopHelper implements Closeable {
     public static final int CLEANUP_COOLDOWN_MILLIS = 10000;
     public static final String[] SQLS_CREATE_TABLES;
     public static final String SQL_CREATE_OR_GET_OWNER_ID = "";
+    public static final String SQL_INSERT_ITEM = "UPDATE ";
+
+    public static final String TABLE_PREFIX = "shop_";
+    public static final String TABLE_OWNER = TABLE_PREFIX + "owner";
+    public static final String TABLE_ITEM = TABLE_PREFIX + "item";
+    public static final String TABLE_SHOP = TABLE_PREFIX + "shop";
+    public static final String TABLE_OFFER = TABLE_PREFIX + "offer";
+    public static final String TABLE_OFFER_ITEMS = TABLE_PREFIX + "offer_items";
+
 
     static {
         ArrayList<String> sql = new ArrayList<>();
@@ -59,7 +68,7 @@ public class ShopHelper implements Closeable {
      * @return the connection
      * @throws SQLException
      */
-    protected Connection getConnection() throws SQLException {
+    public Connection getConnection() throws SQLException {
         Thread t = Thread.currentThread();
         Connection conn = connections.get(t);
         if (conn != null && !conn.isClosed()) return conn;
@@ -122,21 +131,23 @@ public class ShopHelper implements Closeable {
             connectionCleanupThread.interrupt();
     }
 
-    public void execute(String sql) throws SQLException {
-        SQLiteHelper.execute(getConnection(), sql);
-    }
-
-    public int[] executeBatch(String... sqls) throws SQLException {
+    public int[] execute(boolean commit, String... sqls) throws SQLException {
         Connection conn = getConnection();
+        conn.setAutoCommit(false);
         Statement s = conn.createStatement();
         for (String sql : sqls)
             s.addBatch(sql);
         int[] result = s.executeBatch();
-        conn.commit();
+        s.close();
+        if (commit) conn.commit();
         return result;
     }
 
+    public int[] execute(String... sqls) throws SQLException {
+        return execute(true, sqls);
+    }
+
     public void createTables() throws SQLException {
-        executeBatch(SQLS_CREATE_TABLES);
+        execute(SQLS_CREATE_TABLES);
     }
 }

@@ -4,13 +4,22 @@ import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.text.TextComponentString;
+import spontaneouscollection.SpontaneousCollection;
 import spontaneouscollection.common.helper.LangHelper;
+import spontaneouscollection.common.helper.ShopHelper;
 
 import java.lang.annotation.*;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -21,7 +30,7 @@ public class Commands {
 
     @Command
     public static void sc_test(MinecraftServer server, ICommandSender sender, String[] args) {
-        sender.addChatMessage(lang.getTextComponent("sc_test.message"));
+        sender.addChatMessage(lang.getTextComponent("sc_test.message", String.join(" ", args)));
     }
 
     @Command
@@ -32,6 +41,38 @@ public class Commands {
     @Command
     public static void sc_exception(MinecraftServer server, ICommandSender sender, String[] args) {
         throw new RuntimeException("Oh noes, something broke.");
+    }
+
+    //TODO: Make it put into into the network
+    @Command
+    public static void sc_insert(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException, SQLException {
+        if (!(sender instanceof EntityPlayer)) throw new CommandException(lang.getKey("exception.not_a_player"));
+        EntityPlayer player = (EntityPlayer) sender;
+        ItemStack stack = player.getHeldItemMainhand();
+        ShopHelper shops = SpontaneousCollection.proxy.shops;
+        Connection conn = shops.getConnection();
+    }
+
+    //TODO: Remove Debug or limit to OPs
+    @Command
+    public static void sc_sql(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException, SQLException {
+        ShopHelper shops = SpontaneousCollection.proxy.shops;
+        Connection conn = shops.getConnection();
+        conn.setAutoCommit(false);
+        Statement s = conn.createStatement();
+        String sql = String.join(" ", args);
+        boolean hasResults = s.execute(sql);
+        if (hasResults) {
+            ResultSet results;
+            do {
+                results = s.getResultSet();
+                ((EntityPlayer) sender).addChatComponentMessage(new TextComponentString(results.toString()));
+            }
+            while (s.getMoreResults());
+        }
+        s.close();
+        conn.commit();
+        sender.addChatMessage(lang.getTextComponent("sc_sql.success", s.getUpdateCount()));
     }
 
     public static List<ICommand> getCommands(Class c) {
