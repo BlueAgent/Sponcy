@@ -1,10 +1,12 @@
 package spontaneouscollection.common;
 
 import net.minecraft.block.Block;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.event.*;
 import net.minecraftforge.fml.common.registry.GameRegistry;
@@ -58,7 +60,7 @@ public abstract class CommonProxy {
 
         shops = new ShopHelper();
         try {
-            shops.createTables();
+            shops.initShops();
             System.out.println("shops initialised");
         } catch (SQLException e) {
             RuntimeException re = new RuntimeException("Failed to create shops database", e);
@@ -85,5 +87,16 @@ public abstract class CommonProxy {
 
     public void onWorldSave(WorldEvent.Save event) {
 
+    }
+
+    public void onEntityJoinWorld(EntityJoinWorldEvent event) {
+        if(event.getWorld().isRemote) return;
+        if(!(event.getEntity() instanceof EntityPlayer)) return;
+        EntityPlayer player = (EntityPlayer) event.getEntity();
+        try{
+            shops.getOwner(player);
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to load ShopOwner: " + player.getName(), e);
+        }
     }
 }

@@ -1,3 +1,6 @@
+#general
+general.exception=[%s] %s
+
 #Commands
 commands.exception=[%s] %s
 commands.exception.not_a_player=Expected a player.
@@ -9,6 +12,9 @@ commands.sc_exception=Test general exception
 commands.sc_insert=Put held an item into your network~
 commands.sc_sql=Execute an SQL query on the database.
 commands.sc_sql.success=§aSuccess. %d updates.
+commands.sc_sql.success.no_changes=§aSuccess. No changes.
+commands.sc_owner=Get owner
+commands.sc_owner.usage=[id/uuid/name]
 
 #Items
 item.mending_charm.name=Mending Charm

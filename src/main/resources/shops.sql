@@ -1,11 +1,11 @@
-CREATE TABLE IF NOT EXISTS 'shop_owner' (
+CREATE TABLE IF NOT EXISTS 'ShopOwner' (
 	`id`	INTEGER NOT NULL,
 	`uuid`	TEXT NOT NULL UNIQUE,
 	`name`	TEXT NOT NULL,
 	`money`	INTEGER NOT NULL DEFAULT 0 CHECK(money >= 0),
 	PRIMARY KEY(`id`)
 );
-CREATE TABLE IF NOT EXISTS 'shop_item' (
+CREATE TABLE IF NOT EXISTS 'ShopItem' (
 	`id`	INTEGER NOT NULL,
 	`owner`	INTEGER NOT NULL,
 	`item_id`	TEXT NOT NULL,
@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS 'shop_item' (
 	PRIMARY KEY(`id`),
 	FOREIGN KEY(`owner`) REFERENCES `shop_owner.id`
 );
-CREATE TABLE IF NOT EXISTS 'shop_shop' (
+CREATE TABLE IF NOT EXISTS 'ShopShop' (
 	`id`	INTEGER NOT NULL,
 	`owner`	INTEGER NOT NULL,
 	`money`	INTEGER NOT NULL DEFAULT 0 CHECK(money >= 0),
@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS 'shop_shop' (
 	PRIMARY KEY(`id`)
     FOREIGN KEY(`owner`) REFERENCES `shop_owner.id`
 );
-CREATE TABLE IF NOT EXISTS 'shop_offer' (
+CREATE TABLE IF NOT EXISTS 'ShopOffer' (
 	`id`	INTEGER NOT NULL,
 	`shop`	INTEGER NOT NULL,
 	`money`	INTEGER NOT NULL DEFAULT 0,
@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS 'shop_offer' (
 	PRIMARY KEY(`id`)
     FOREIGN KEY(`shop`) REFERENCES `shop_shop.id`
 );
-CREATE TABLE IF NOT EXISTS 'shop_offer_items' (
+CREATE TABLE IF NOT EXISTS 'ShopOfferItems' (
 	`id`	INTEGER NOT NULL,
 	`offer`	INTEGER NOT NULL,
 	`item`	INTEGER NOT NULL,

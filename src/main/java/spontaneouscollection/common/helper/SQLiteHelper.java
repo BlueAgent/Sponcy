@@ -68,10 +68,63 @@ public class SQLiteHelper {
         return connect(new File(saveDirectory, databaseName));
     }
 
-    public static void execute(Connection conn, String sql) throws SQLException {
-        try (Statement s = conn.createStatement()) {
-            s.execute(sql);
+    public static int[] execute(Connection conn, boolean commit, String... sqls) throws SQLException {
+        conn.setAutoCommit(false);
+        Statement s = conn.createStatement();
+        for (String sql : sqls)
+            s.addBatch(sql);
+        int[] result = s.executeBatch();
+        s.close();
+        if (commit) conn.commit();
+        return result;
+    }
+
+    public static int[] execute(Connection conn, String... sqls) throws SQLException {
+        return execute(conn, true, sqls);
+    }
+
+    public static <T> T rollbackAndThrow(Connection conn, ISQLFunction<T> func) throws SQLException {
+        Savepoint save = conn.setSavepoint();
+        try {
+            return func.run();
+        } catch (SQLException e) {
+            conn.rollback(save);
+            throw e;
         }
-        conn.commit();
+    }
+
+    public static void rollbackAndThrow(Connection conn, ISQLRunnable func) throws SQLException {
+        rollbackAndThrow(conn, () -> {
+            func.run();
+            return false;
+        });
+    }
+
+    public static <T> T rollbackAndThrowWithCommit(Connection conn, ISQLFunction<T> func) throws SQLException {
+        conn.setAutoCommit(false);
+        Savepoint save = conn.setSavepoint();
+        try {
+            T yay = func.run();
+            conn.commit();
+            return yay;
+        } catch (SQLException e) {
+            conn.rollback(save);
+            throw e;
+        }
+    }
+
+    public static void rollbackAndThrowWithCommit(Connection conn, ISQLRunnable func) throws SQLException {
+        rollbackAndThrowWithCommit(conn, () -> {
+            func.run();
+            return false;
+        });
+    }
+
+    public interface ISQLFunction<E> {
+        E run() throws SQLException;
+    }
+
+    public interface ISQLRunnable {
+        void run() throws SQLException;
     }
 }

@@ -1,17 +1,21 @@
 package spontaneouscollection.common.helper;
 
+import net.minecraft.entity.player.EntityPlayer;
 import spontaneouscollection.SpontaneousCollection;
+import spontaneouscollection.common.sql.ShopOwner;
 
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Semaphore;
+import java.util.regex.Pattern;
 
 /**
  * Manages connections to the shops database.
@@ -22,16 +26,13 @@ public class ShopHelper implements Closeable {
     public static final int SEMA_MAX = 5;
     public static final int CLEANUP_COOLDOWN_MILLIS = 10000;
     public static final String[] SQLS_CREATE_TABLES;
-    public static final String SQL_CREATE_OR_GET_OWNER_ID = "";
-    public static final String SQL_INSERT_ITEM = "UPDATE ";
 
-    public static final String TABLE_PREFIX = "shop_";
-    public static final String TABLE_OWNER = TABLE_PREFIX + "owner";
-    public static final String TABLE_ITEM = TABLE_PREFIX + "item";
-    public static final String TABLE_SHOP = TABLE_PREFIX + "shop";
-    public static final String TABLE_OFFER = TABLE_PREFIX + "offer";
-    public static final String TABLE_OFFER_ITEMS = TABLE_PREFIX + "offer_items";
-
+    public static final String TABLE_PREFIX = "Shop";
+    public static final String TABLE_OWNER = TABLE_PREFIX + "Owner";
+    public static final String TABLE_ITEM = TABLE_PREFIX + "Item";
+    public static final String TABLE_SHOP = TABLE_PREFIX + "Shop";
+    public static final String TABLE_OFFER = TABLE_PREFIX + "Offer";
+    public static final String TABLE_OFFER_ITEMS = TABLE_PREFIX + "OfferItems";
 
     static {
         ArrayList<String> sql = new ArrayList<>();
@@ -53,6 +54,8 @@ public class ShopHelper implements Closeable {
     protected Semaphore connectionSema = new Semaphore(SEMA_MAX);
     protected ConcurrentHashMap<Thread, Connection> connections = new ConcurrentHashMap<>();
     protected Thread connectionCleanupThread;
+    protected Map<UUID, ShopOwner> owners_uuid = new HashMap<>();
+    protected Map<Integer, ShopOwner> owners_id = new HashMap<>();
 
     public ShopHelper() {
         connectionCleanupThread = new Thread(this::connectionCleanupThread);
@@ -87,6 +90,7 @@ public class ShopHelper implements Closeable {
     private void connectionCleanupThread() {
         try {
             while (!closing) {
+                int cleaned = 0;
                 //Prevent creation of new connections temporarily
                 connectionSema.acquireUninterruptibly(SEMA_MAX);
                 for (Map.Entry<Thread, Connection> entry : connections.entrySet()) {
@@ -100,8 +104,10 @@ public class ShopHelper implements Closeable {
                                 .printStackTrace();
                     }
                     connections.remove(t);
+                    cleaned++;
                 }
                 connectionSema.release(SEMA_MAX);
+                if(cleaned > 0) System.out.println("Freed " + cleaned + " threads.");
                 Thread.sleep(CLEANUP_COOLDOWN_MILLIS);
             }
         } catch (InterruptedException e) {
@@ -132,22 +138,76 @@ public class ShopHelper implements Closeable {
     }
 
     public int[] execute(boolean commit, String... sqls) throws SQLException {
-        Connection conn = getConnection();
-        conn.setAutoCommit(false);
-        Statement s = conn.createStatement();
-        for (String sql : sqls)
-            s.addBatch(sql);
-        int[] result = s.executeBatch();
-        s.close();
-        if (commit) conn.commit();
-        return result;
+        return SQLiteHelper.execute(getConnection(), commit, sqls);
     }
 
     public int[] execute(String... sqls) throws SQLException {
         return execute(true, sqls);
     }
 
-    public void createTables() throws SQLException {
+    public void initShops() throws SQLException {
         execute(SQLS_CREATE_TABLES);
+        for (ShopOwner owner : ShopOwner.getAll(this)) {
+            owners_id.put(owner.getId(), owner);
+            owners_uuid.put(owner.getUuid(), owner);
+        }
+    }
+
+    //ShopOwner methods
+    public ShopOwner getOwner(int id) throws SQLException {
+        ShopOwner owner = owners_id.get(id);
+        if(owner != null) return owner;
+        owner = ShopOwner.get(this, id);
+        owners_id.put(owner.getId(), owner);
+        owners_uuid.put(owner.getUuid(), owner);
+        return owner;
+    }
+
+    public ShopOwner getOwner(EntityPlayer player) throws SQLException {
+        ShopOwner owner = owners_uuid.get(PlayerHelper.getUUID(player));
+        if(owner != null) return owner;
+        owner = ShopOwner.get(this, player);
+        owners_id.put(owner.getId(), owner);
+        owners_uuid.put(owner.getUuid(), owner);
+        return owner;
+    }
+
+    public ShopOwner getOwner(UUID uuid, String name) throws SQLException {
+        ShopOwner owner = owners_uuid.get(uuid);
+        if(owner != null) return owner;
+        owner = ShopOwner.get(this, uuid, name);
+        owners_id.put(owner.getId(), owner);
+        owners_uuid.put(owner.getUuid(), owner);
+        return owner;
+    }
+
+    public ShopOwner getOwner(UUID uuid) throws SQLException {
+        ShopOwner owner = owners_uuid.get(uuid);
+        if(owner != null) return owner;
+        throw new SQLException("0 uuid=" + uuid);
+    }
+
+    public ShopOwner getOwner(String name) throws SQLException {
+        ShopOwner owner = owners_uuid.values().stream().filter((o)->o.getName().equals(name)).findFirst().orElse(null);
+        if(owner != null) return owner;
+        throw new SQLException("0 name=: " + name);
+    }
+
+    public ShopOwner getOwnerSimilar(String name) throws SQLException {
+        ShopOwner owner = owners_uuid.values().stream().filter((o)->o.getName().equals(name)).findFirst().orElse(null);
+        if(owner != null) return owner;
+
+        String search = StringHelper.MATCH_NON_WORD.matcher(name.toLowerCase()).replaceAll("");
+        owner = owners_uuid.values().stream().filter(
+                (o)->StringHelper.MATCH_NON_WORD.matcher(o.getName().toLowerCase()).replaceAll("").equals(search)
+        ).findFirst().orElse(null);
+        if(owner != null) return owner;
+
+        owner = owners_uuid.values().stream().filter(
+                (o)->StringHelper.MATCH_NON_WORD.matcher(o.getName().toLowerCase()).replaceAll("").contains(search)
+        ).findFirst().orElse(null);
+        if(owner != null) return owner;
+
+        throw new SQLException("0 name~=" + name);
     }
 }

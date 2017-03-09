@@ -1,16 +1,14 @@
 package spontaneouscollection.common.command;
 
-import net.minecraft.command.CommandBase;
-import net.minecraft.command.CommandException;
-import net.minecraft.command.ICommand;
-import net.minecraft.command.ICommandSender;
+import net.minecraft.command.*;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
 import spontaneouscollection.SpontaneousCollection;
-import spontaneouscollection.common.helper.LangHelper;
-import spontaneouscollection.common.helper.ShopHelper;
+import spontaneouscollection.common.helper.*;
+import spontaneouscollection.common.sql.ShopOwner;
 
 import java.lang.annotation.*;
 import java.lang.reflect.InvocationTargetException;
@@ -20,13 +18,16 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.UUID;
 
 @Commands.CommandHolder("commands.")
 public class Commands {
-    public static final String COMMAND_EXCEPTION = "commands.exception";
     public static final LangHelper lang = new LangHelper("commands.");
+    public static final String COMMAND_EXCEPTION = lang.getKey("exception");
+    public static final String NOT_A_PLAYER = lang.getKey("exception.not_a_player");
 
     @Command
     public static void sc_test(MinecraftServer server, ICommandSender sender, String[] args) {
@@ -56,23 +57,80 @@ public class Commands {
     //TODO: Remove Debug or limit to OPs
     @Command
     public static void sc_sql(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException, SQLException {
-        ShopHelper shops = SpontaneousCollection.proxy.shops;
-        Connection conn = shops.getConnection();
-        conn.setAutoCommit(false);
-        Statement s = conn.createStatement();
-        String sql = String.join(" ", args);
-        boolean hasResults = s.execute(sql);
-        if (hasResults) {
-            ResultSet results;
-            do {
-                results = s.getResultSet();
-                ((EntityPlayer) sender).addChatComponentMessage(new TextComponentString(results.toString()));
+        final ShopHelper shops = SpontaneousCollection.proxy.shops;
+        final String sql = String.join(" ", args);
+
+        ThreadHelper.get().name("sc_sql by " + sender.getName()).run(() -> {
+            final List<ITextComponent> components = new LinkedList<>();
+            try {
+                Connection conn = shops.getConnection();
+                SQLiteHelper.rollbackAndThrowWithCommit(conn, () -> {
+                    Statement s = conn.createStatement();
+                    boolean hasResults = s.execute(sql);
+                    if (hasResults) {
+                        ResultSet results = s.getResultSet();
+                        while (results.next()) {
+                            components.add(new TextComponentString(StringHelper.stringify(results)));
+                        }
+                    }
+                    s.close();
+                    int updates = s.getUpdateCount();
+                    if(updates < 0)
+                        components.add(lang.getTextComponent("sc_sql.success.no_changes"));
+                    else
+                        components.add(lang.getTextComponent("sc_sql.success", updates));
+                });
+            } catch (SQLException e) {
+                components.add(LangHelper.NO_PREFIX.getTextComponent(e));
             }
-            while (s.getMoreResults());
+            //Add use of this command to the server log
+            server.logWarning(sender.getName()
+                    + " used sc_sql. Query: " + sql
+                    + "Results: " + Arrays.toString(components.toArray(new ITextComponent[0])));
+            SyncHelper.addScheduledTask(false, () -> {
+                components.forEach(sender::addChatMessage);
+            });
+        });
+    }
+
+    @Command
+    public static void sc_owner(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException, SQLException {
+        final ShopHelper shops = SpontaneousCollection.proxy.shops;
+        final SQLiteHelper.ISQLFunction<ShopOwner> method_temp;
+        if(args.length == 0){
+            if(!(sender instanceof EntityPlayer))
+                throw new CommandException(NOT_A_PLAYER);
+            method_temp = ()->shops.getOwner((EntityPlayer) sender);
+        }else if(args.length == 1) {
+            final String input = args[0];
+            method_temp = ()->{
+                try{
+                    int id = Integer.parseInt(input);
+                    return shops.getOwner(id);
+                }catch(NumberFormatException e){}
+                try{
+                    UUID id = UUID.fromString(input);
+                    return shops.getOwner(id);
+                }catch(IllegalArgumentException e){}
+                return shops.getOwner(input);
+            };
+        }else{
+            throw new WrongUsageException(lang.getKey("sc_owner.usage"));
         }
-        s.close();
-        conn.commit();
-        sender.addChatMessage(lang.getTextComponent("sc_sql.success", s.getUpdateCount()));
+
+        final SQLiteHelper.ISQLFunction<ShopOwner> method = method_temp;
+        ThreadHelper.get().name("sc_owner by " + sender.getName()).run(() -> {
+            final List<ITextComponent> components = new LinkedList<>();
+            try {
+                ShopOwner owner = method.run();
+                components.add(new TextComponentString(owner.toString()));
+            } catch (SQLException e) {
+                components.add(LangHelper.NO_PREFIX.getTextComponent(e));
+            }
+            SyncHelper.addScheduledTask(false, () -> {
+                components.forEach(sender::addChatMessage);
+            });
+        });
     }
 
     public static List<ICommand> getCommands(Class c) {
