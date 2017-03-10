@@ -41,11 +41,6 @@ public class ShopOwner {
         this.money = money;
     }
 
-    @Override
-    public String toString() {
-        return "ShopOwner[" + id + "," + uuid + "," + name + "," + money + "]";
-    }
-
     public static ShopOwner get(ShopHelper shop, final int id) throws SQLException {
         Connection conn = shop.getConnection();
         return SQLiteHelper.rollbackAndThrowWithCommit(conn, () -> {
@@ -53,7 +48,7 @@ public class ShopOwner {
             select.setInt(1, id);
             ResultSet result = select.executeQuery();
             if (!result.next()) throw new SQLException("Expected a result after successfully inserting.");
-            if(id != result.getInt("id")){
+            if (id != result.getInt("id")) {
                 throw new SQLException("ID different from selected?");
             }
             UUID uuid = UUID.fromString(result.getString("uuid"));
@@ -88,10 +83,10 @@ public class ShopOwner {
             ResultSet result = select.executeQuery();
             if (!result.next()) throw new SQLException("Expected a result after successfully inserting.");
             id = result.getInt("id");
-            if(!uuid.equals(UUID.fromString(result.getString("uuid")))){
+            if (!uuid.equals(UUID.fromString(result.getString("uuid")))) {
                 throw new SQLException("UUID was not updated?");
             }
-            if(!name.equals(result.getString("name"))) {
+            if (!name.equals(result.getString("name"))) {
                 throw new SQLException("Name was not updated?");
             }
             money = result.getLong("money");
@@ -117,6 +112,11 @@ public class ShopOwner {
         result.close();
         s.close();
         return owners;
+    }
+
+    @Override
+    public String toString() {
+        return "ShopOwner[" + id + "," + uuid + "," + name + "," + money + "]";
     }
 
     public int getId() {

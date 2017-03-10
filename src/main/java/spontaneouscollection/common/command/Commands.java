@@ -18,7 +18,6 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
@@ -28,10 +27,12 @@ public class Commands {
     public static final LangHelper lang = new LangHelper("commands.");
     public static final String COMMAND_EXCEPTION = lang.getKey("exception");
     public static final String NOT_A_PLAYER = lang.getKey("exception.not_a_player");
+    public static final String NOT_OP = lang.getKey("exception.not_op");
 
     @Command
     public static void sc_test(MinecraftServer server, ICommandSender sender, String[] args) {
         sender.addChatMessage(lang.getTextComponent("sc_test.message", String.join(" ", args)));
+        sender.addChatMessage(new TextComponentString("isFake: " + PlayerHelper.isFake(sender)));
     }
 
     @Command
@@ -52,16 +53,20 @@ public class Commands {
         ItemStack stack = player.getHeldItemMainhand();
         ShopHelper shops = SpontaneousCollection.proxy.shops;
         Connection conn = shops.getConnection();
+
+        //TODO: Remove Debug or limit to OPs
     }
 
-    //TODO: Remove Debug or limit to OPs
     @Command
     public static void sc_sql(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException, SQLException {
         final ShopHelper shops = SpontaneousCollection.proxy.shops;
         final String sql = String.join(" ", args);
 
+        if (!isOp(sender)) new CommandException(NOT_OP);
+
         ThreadHelper.get().name("sc_sql by " + sender.getName()).run(() -> {
-            final List<ITextComponent> components = new LinkedList<>();
+            long duration = System.nanoTime();
+            final LinkedList<ITextComponent> components = new LinkedList<>();
             try {
                 Connection conn = shops.getConnection();
                 SQLiteHelper.rollbackAndThrowWithCommit(conn, () -> {
@@ -75,7 +80,7 @@ public class Commands {
                     }
                     s.close();
                     int updates = s.getUpdateCount();
-                    if(updates < 0)
+                    if (updates < 0)
                         components.add(lang.getTextComponent("sc_sql.success.no_changes"));
                     else
                         components.add(lang.getTextComponent("sc_sql.success", updates));
@@ -83,10 +88,13 @@ public class Commands {
             } catch (SQLException e) {
                 components.add(LangHelper.NO_PREFIX.getTextComponent(e));
             }
+            duration = System.nanoTime() - duration;
+            //Convert nanoseconds to milliseconds
+            components.addFirst(new TextComponentString((duration / 1000000.0) + "ms"));
             //Add use of this command to the server log
             server.logWarning(sender.getName()
                     + " used sc_sql. Query: " + sql
-                    + "Results: " + Arrays.toString(components.toArray(new ITextComponent[0])));
+                    + " Results: " + String.join("\n", components.stream().map((tc) -> tc.getFormattedText()).toArray((len) -> new String[len])));
             SyncHelper.addScheduledTask(false, () -> {
                 components.forEach(sender::addChatMessage);
             });
@@ -97,24 +105,26 @@ public class Commands {
     public static void sc_owner(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException, SQLException {
         final ShopHelper shops = SpontaneousCollection.proxy.shops;
         final SQLiteHelper.ISQLFunction<ShopOwner> method_temp;
-        if(args.length == 0){
-            if(!(sender instanceof EntityPlayer))
+        if (args.length == 0) {
+            if (!(sender instanceof EntityPlayer))
                 throw new CommandException(NOT_A_PLAYER);
-            method_temp = ()->shops.getOwner((EntityPlayer) sender);
-        }else if(args.length == 1) {
+            method_temp = () -> shops.getOwner((EntityPlayer) sender);
+        } else if (args.length == 1) {
             final String input = args[0];
-            method_temp = ()->{
-                try{
+            method_temp = () -> {
+                try {
                     int id = Integer.parseInt(input);
                     return shops.getOwner(id);
-                }catch(NumberFormatException e){}
-                try{
+                } catch (NumberFormatException e) {
+                }
+                try {
                     UUID id = UUID.fromString(input);
                     return shops.getOwner(id);
-                }catch(IllegalArgumentException e){}
+                } catch (IllegalArgumentException e) {
+                }
                 return shops.getOwner(input);
             };
-        }else{
+        } else {
             throw new WrongUsageException(lang.getKey("sc_owner.usage"));
         }
 
@@ -142,6 +152,10 @@ public class Commands {
             commands.add(new CommandInstance(m));
         }
         return commands;
+    }
+
+    public static boolean isOp(ICommandSender sender) {
+        return sender.canCommandSenderUseCommand(2, "");
     }
 
     @Retention(RetentionPolicy.RUNTIME)

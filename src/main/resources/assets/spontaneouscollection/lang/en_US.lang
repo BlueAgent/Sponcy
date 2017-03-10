@@ -4,6 +4,7 @@ general.exception=[%s] %s
 #Commands
 commands.exception=[%s] %s
 commands.exception.not_a_player=Expected a player.
+commands.exception.not_op=OP is required for this command.
 commands.sc_test=A test command.
 commands.sc_test.message="Hello, your friendly neighbourhood cheesecake here! %s"
 commands.sc_error=Test command exception

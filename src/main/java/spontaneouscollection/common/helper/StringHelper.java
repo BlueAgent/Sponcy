@@ -20,8 +20,8 @@ public class StringHelper {
     public static String stringify(ResultSet r) throws SQLException {
         StringBuilder build = new StringBuilder();
         ResultSetMetaData meta = r.getMetaData();
-        for(int i = 1; i <= meta.getColumnCount(); i++) {
-            if(i != 1) build.append(',');
+        for (int i = 1; i <= meta.getColumnCount(); i++) {
+            if (i != 1) build.append(',');
             build.append(meta.getColumnName(i));
             build.append('=');
             build.append(r.getString(i));

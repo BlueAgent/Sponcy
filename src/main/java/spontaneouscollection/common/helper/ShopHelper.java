@@ -15,7 +15,6 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Semaphore;
-import java.util.regex.Pattern;
 
 /**
  * Manages connections to the shops database.
@@ -107,7 +106,7 @@ public class ShopHelper implements Closeable {
                     cleaned++;
                 }
                 connectionSema.release(SEMA_MAX);
-                if(cleaned > 0) System.out.println("Freed " + cleaned + " threads.");
+                if (cleaned > 0) System.out.println("Freed " + cleaned + " threads.");
                 Thread.sleep(CLEANUP_COOLDOWN_MILLIS);
             }
         } catch (InterruptedException e) {
@@ -156,7 +155,7 @@ public class ShopHelper implements Closeable {
     //ShopOwner methods
     public ShopOwner getOwner(int id) throws SQLException {
         ShopOwner owner = owners_id.get(id);
-        if(owner != null) return owner;
+        if (owner != null) return owner;
         owner = ShopOwner.get(this, id);
         owners_id.put(owner.getId(), owner);
         owners_uuid.put(owner.getUuid(), owner);
@@ -165,7 +164,7 @@ public class ShopHelper implements Closeable {
 
     public ShopOwner getOwner(EntityPlayer player) throws SQLException {
         ShopOwner owner = owners_uuid.get(PlayerHelper.getUUID(player));
-        if(owner != null) return owner;
+        if (owner != null) return owner;
         owner = ShopOwner.get(this, player);
         owners_id.put(owner.getId(), owner);
         owners_uuid.put(owner.getUuid(), owner);
@@ -174,7 +173,7 @@ public class ShopHelper implements Closeable {
 
     public ShopOwner getOwner(UUID uuid, String name) throws SQLException {
         ShopOwner owner = owners_uuid.get(uuid);
-        if(owner != null) return owner;
+        if (owner != null) return owner;
         owner = ShopOwner.get(this, uuid, name);
         owners_id.put(owner.getId(), owner);
         owners_uuid.put(owner.getUuid(), owner);
@@ -183,30 +182,30 @@ public class ShopHelper implements Closeable {
 
     public ShopOwner getOwner(UUID uuid) throws SQLException {
         ShopOwner owner = owners_uuid.get(uuid);
-        if(owner != null) return owner;
+        if (owner != null) return owner;
         throw new SQLException("0 uuid=" + uuid);
     }
 
     public ShopOwner getOwner(String name) throws SQLException {
-        ShopOwner owner = owners_uuid.values().stream().filter((o)->o.getName().equals(name)).findFirst().orElse(null);
-        if(owner != null) return owner;
+        ShopOwner owner = owners_uuid.values().stream().filter((o) -> o.getName().equals(name)).findFirst().orElse(null);
+        if (owner != null) return owner;
         throw new SQLException("0 name=: " + name);
     }
 
     public ShopOwner getOwnerSimilar(String name) throws SQLException {
-        ShopOwner owner = owners_uuid.values().stream().filter((o)->o.getName().equals(name)).findFirst().orElse(null);
-        if(owner != null) return owner;
+        ShopOwner owner = owners_uuid.values().stream().filter((o) -> o.getName().equals(name)).findFirst().orElse(null);
+        if (owner != null) return owner;
 
         String search = StringHelper.MATCH_NON_WORD.matcher(name.toLowerCase()).replaceAll("");
         owner = owners_uuid.values().stream().filter(
-                (o)->StringHelper.MATCH_NON_WORD.matcher(o.getName().toLowerCase()).replaceAll("").equals(search)
+                (o) -> StringHelper.MATCH_NON_WORD.matcher(o.getName().toLowerCase()).replaceAll("").equals(search)
         ).findFirst().orElse(null);
-        if(owner != null) return owner;
+        if (owner != null) return owner;
 
         owner = owners_uuid.values().stream().filter(
-                (o)->StringHelper.MATCH_NON_WORD.matcher(o.getName().toLowerCase()).replaceAll("").contains(search)
+                (o) -> StringHelper.MATCH_NON_WORD.matcher(o.getName().toLowerCase()).replaceAll("").contains(search)
         ).findFirst().orElse(null);
-        if(owner != null) return owner;
+        if (owner != null) return owner;
 
         throw new SQLException("0 name~=" + name);
     }

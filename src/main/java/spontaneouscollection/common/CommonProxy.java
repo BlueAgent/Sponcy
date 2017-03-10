@@ -90,10 +90,10 @@ public abstract class CommonProxy {
     }
 
     public void onEntityJoinWorld(EntityJoinWorldEvent event) {
-        if(event.getWorld().isRemote) return;
-        if(!(event.getEntity() instanceof EntityPlayer)) return;
+        if (event.getWorld().isRemote) return;
+        if (!(event.getEntity() instanceof EntityPlayer)) return;
         EntityPlayer player = (EntityPlayer) event.getEntity();
-        try{
+        try {
             shops.getOwner(player);
         } catch (SQLException e) {
             throw new RuntimeException("Failed to load ShopOwner: " + player.getName(), e);
