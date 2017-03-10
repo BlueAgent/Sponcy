@@ -7,6 +7,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
 import spontaneouscollection.SpontaneousCollection;
+import spontaneouscollection.common.SCConfig;
 import spontaneouscollection.common.helper.*;
 import spontaneouscollection.common.sql.ShopOwner;
 
@@ -59,10 +60,11 @@ public class Commands {
 
     @Command
     public static void sc_sql(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException, SQLException {
+        if(SCConfig.Shops.disable_sc_sql) new CommandException(lang.getKey("sc_sql.disabled"));
+        if (!isOp(sender)) new CommandException(NOT_OP);
+
         final ShopHelper shops = SpontaneousCollection.proxy.shops;
         final String sql = String.join(" ", args);
-
-        if (!isOp(sender)) new CommandException(NOT_OP);
 
         ThreadHelper.get().name("sc_sql by " + sender.getName()).run(() -> {
             long duration = System.nanoTime();

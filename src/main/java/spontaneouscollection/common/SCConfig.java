@@ -8,6 +8,7 @@ import static net.minecraftforge.common.config.Config.*;
 @Config(modid = SpontaneousCollection.MOD_ID)
 public class SCConfig {
     public static MendingCharm mending_charm;
+    public static Shops shops;
 
     public static class MendingCharm {
         @Comment("Should the default recipe be added?")
@@ -33,5 +34,10 @@ public class SCConfig {
 
         @Comment("Send debug chat message showing how much xp was used and how much was repaired out of the total missing.")
         public static boolean debug = false;
+    }
+
+    public static class Shops {
+        @Comment("Disable raw sql statement execution (for OPs only when enabled).")
+        public static boolean disable_sc_sql = false;
     }
 }

@@ -14,6 +14,7 @@ commands.sc_insert=Put held an item into your network~
 commands.sc_sql=Execute an SQL query on the database.
 commands.sc_sql.success=§aSuccess. %d updates.
 commands.sc_sql.success.no_changes=§aSuccess. No changes.
+commands.sc_sql.disabled=Raw SQL statement execution disabled in config.
 commands.sc_owner=Get owner
 commands.sc_owner.usage=[id/uuid/name]
 
