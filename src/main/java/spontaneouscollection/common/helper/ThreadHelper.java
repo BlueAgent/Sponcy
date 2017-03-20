@@ -18,7 +18,7 @@ public class ThreadHelper {
         if (name != null) t.setName(name);
         t.setDaemon(daemon);
         t.setPriority(priority);
-        t.run();
+        t.start();
         return this;
     }
 

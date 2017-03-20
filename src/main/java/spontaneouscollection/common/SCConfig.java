@@ -39,5 +39,12 @@ public class SCConfig {
     public static class Shops {
         @Comment("Disable raw sql statement execution (for OPs only when enabled).")
         public static boolean disable_sc_sql = false;
+
+        @Comment("Offloads work from the main thread where supported, but takes longer to build up a query cache, so the total cpu use will be higher. Operations in game will be more delayed (instead of responding in the same tick, it will respond in the next tick after it completes. Some operations will always run on the thread pool however.")
+        public static boolean threads_enabled = true;
+
+        @Comment("Max size of the Thread Pool")
+        @RangeInt(min=1,max=10)
+        public static int threads_count = 5;
     }
 }

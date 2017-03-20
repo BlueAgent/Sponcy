@@ -1,9 +1,13 @@
 package spontaneouscollection.common.helper;
 
+import com.sun.istack.internal.NotNull;
 import net.minecraft.entity.player.EntityPlayer;
 import spontaneouscollection.SpontaneousCollection;
+import spontaneouscollection.common.SCConfig;
 import spontaneouscollection.common.sql.ShopOwner;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
@@ -13,14 +17,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Semaphore;
+import java.util.concurrent.*;
 
 /**
  * Manages connections to the shops database.
  * Creates one connection per thread.
  */
-public class ShopHelper implements Closeable {
+public class ShopHelper implements Closeable, ThreadFactory {
     public static final String DB_FILE = "shops.db";
     public static final int SEMA_MAX = 5;
     public static final int CLEANUP_COOLDOWN_MILLIS = 10000;
@@ -55,17 +58,58 @@ public class ShopHelper implements Closeable {
     protected Thread connectionCleanupThread;
     protected Map<UUID, ShopOwner> owners_uuid = new HashMap<>();
     protected Map<Integer, ShopOwner> owners_id = new HashMap<>();
+    protected final ExecutorService executorService;
+    protected final ThreadGroup threadGroup = new ThreadGroup("SCShops Workers");
 
     public ShopHelper() {
         connectionCleanupThread = new Thread(this::connectionCleanupThread);
-        connectionCleanupThread.setName("Connection Cleanup Thread");
+        connectionCleanupThread.setName("[SCShops] Connection Cleanup Thread");
         connectionCleanupThread.setDaemon(true);
         connectionCleanupThread.start();
+        executorService = Executors.newFixedThreadPool(SCConfig.Shops.threads_count, this);
+    }
+
+    /**
+     * CAREFUL USING THIS METHOD
+     * Behaviour can either be:
+     * - Running synchronously on the current thread
+     * - Running asynchronously on the executor service pool
+     * Depends on the config
+     * @param r to execute
+     */
+    public void run(Runnable r)
+    {
+        if(SCConfig.Shops.threads_enabled)
+            executorService.submit(r);
+        else
+            r.run();
+    }
+
+    @Override
+    public Thread newThread(Runnable r) {
+        Thread t = new Thread(threadGroup, r);
+        t.setName("[SCShops] Worker Thread");
+        return t;
+    }
+
+    /**
+     * The executor service.
+     * Please respect the SCConfig.Shops.threads_enabled config.
+     * @return the executor service, always exists.
+     */
+    @Nonnull
+    public ExecutorService executor()
+    {
+        return executorService;
     }
 
     /**
      * Gets a new connection for the current thread.
      * Please close the connection if your thread does not reuse connection.
+     * Threads will be periodically cleaned up if no longer running.
+     * Highly suggesting using the executor service {@link #executor()}
+     * or use the run method {@link #run(Runnable)}
+     *
      *
      * @return the connection
      * @throws SQLException
@@ -95,6 +139,8 @@ public class ShopHelper implements Closeable {
                 for (Map.Entry<Thread, Connection> entry : connections.entrySet()) {
                     Thread t = entry.getKey();
                     if (t.isAlive()) continue;
+                    //Skip threads in the group
+                    if (t.getThreadGroup() == threadGroup) continue;
                     Connection conn = entry.getValue();
                     try {
                         if (!conn.isClosed()) conn.close();
@@ -123,6 +169,8 @@ public class ShopHelper implements Closeable {
         connectionSema.acquireUninterruptibly(SEMA_MAX);
         closing = true;
         connectionSema.release(SEMA_MAX);
+        if (connectionCleanupThread.isAlive())
+            connectionCleanupThread.interrupt();
         //No more new connections should be made now
         for (Map.Entry<Thread, Connection> entry : connections.entrySet()) {
             try {
@@ -132,8 +180,7 @@ public class ShopHelper implements Closeable {
             }
             entry.getKey().interrupt();
         }
-        if (connectionCleanupThread.isAlive())
-            connectionCleanupThread.interrupt();
+        executorService.shutdown();
     }
 
     public int[] execute(boolean commit, String... sqls) throws SQLException {

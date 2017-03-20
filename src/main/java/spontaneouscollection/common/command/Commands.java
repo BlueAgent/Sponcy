@@ -66,7 +66,7 @@ public class Commands {
         final ShopHelper shops = SpontaneousCollection.proxy.shops;
         final String sql = String.join(" ", args);
 
-        ThreadHelper.get().name("sc_sql by " + sender.getName()).run(() -> {
+        shops.run(() -> {
             long duration = System.nanoTime();
             final LinkedList<ITextComponent> components = new LinkedList<>();
             try {
@@ -131,7 +131,7 @@ public class Commands {
         }
 
         final SQLiteHelper.ISQLFunction<ShopOwner> method = method_temp;
-        ThreadHelper.get().name("sc_owner by " + sender.getName()).run(() -> {
+        shops.run(() -> {
             final List<ITextComponent> components = new LinkedList<>();
             try {
                 ShopOwner owner = method.run();
