@@ -11,6 +11,7 @@ commands.sc_error=Test command exception
 commands.sc_error.error=ERROR TEST BEEP BOOP!!!!!
 commands.sc_exception=Test general exception
 commands.sc_insert=Put held an item into your network~
+commands.sc_insert.missing=Hold the item you want to put inside the network.
 commands.sc_sql=Execute an SQL query on the database.
 commands.sc_sql.success=§aSuccess. %d updates.
 commands.sc_sql.success.no_changes=§aSuccess. No changes.

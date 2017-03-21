@@ -1,13 +1,11 @@
 package spontaneouscollection.common.helper;
 
-import com.sun.istack.internal.NotNull;
 import net.minecraft.entity.player.EntityPlayer;
 import spontaneouscollection.SpontaneousCollection;
 import spontaneouscollection.common.SCConfig;
 import spontaneouscollection.common.sql.ShopOwner;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
@@ -52,14 +50,14 @@ public class ShopHelper implements Closeable, ThreadFactory {
         SQLS_CREATE_TABLES = sql.toArray(new String[0]);
     }
 
+    protected final ExecutorService executorService;
+    protected final ThreadGroup threadGroup = new ThreadGroup("SCShops Workers");
     protected boolean closing = false;
     protected Semaphore connectionSema = new Semaphore(SEMA_MAX);
     protected ConcurrentHashMap<Thread, Connection> connections = new ConcurrentHashMap<>();
     protected Thread connectionCleanupThread;
     protected Map<UUID, ShopOwner> owners_uuid = new HashMap<>();
     protected Map<Integer, ShopOwner> owners_id = new HashMap<>();
-    protected final ExecutorService executorService;
-    protected final ThreadGroup threadGroup = new ThreadGroup("SCShops Workers");
 
     public ShopHelper() {
         connectionCleanupThread = new Thread(this::connectionCleanupThread);
@@ -75,11 +73,11 @@ public class ShopHelper implements Closeable, ThreadFactory {
      * - Running synchronously on the current thread
      * - Running asynchronously on the executor service pool
      * Depends on the config
+     *
      * @param r to execute
      */
-    public void run(Runnable r)
-    {
-        if(SCConfig.Shops.threads_enabled)
+    public void run(Runnable r) {
+        if (SCConfig.Shops.threads_enabled)
             executorService.submit(r);
         else
             r.run();
@@ -95,11 +93,11 @@ public class ShopHelper implements Closeable, ThreadFactory {
     /**
      * The executor service.
      * Please respect the SCConfig.Shops.threads_enabled config.
+     *
      * @return the executor service, always exists.
      */
     @Nonnull
-    public ExecutorService executor()
-    {
+    public ExecutorService executor() {
         return executorService;
     }
 
@@ -109,7 +107,6 @@ public class ShopHelper implements Closeable, ThreadFactory {
      * Threads will be periodically cleaned up if no longer running.
      * Highly suggesting using the executor service {@link #executor()}
      * or use the run method {@link #run(Runnable)}
-     *
      *
      * @return the connection
      * @throws SQLException

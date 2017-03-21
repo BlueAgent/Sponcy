@@ -4,6 +4,7 @@ import net.minecraft.command.*;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.EnumHand;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
 import spontaneouscollection.SpontaneousCollection;
@@ -51,16 +52,20 @@ public class Commands {
     public static void sc_insert(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException, SQLException {
         if (!(sender instanceof EntityPlayer)) throw new CommandException(lang.getKey("exception.not_a_player"));
         EntityPlayer player = (EntityPlayer) sender;
-        ItemStack stack = player.getHeldItemMainhand();
+        final ItemStack stack = player.getHeldItemMainhand();
+        //TODO: 1.11 update null
+        if (stack == null) {
+            throw new CommandException(lang.getKey("sc_insert.missing"));
+        }
         ShopHelper shops = SpontaneousCollection.proxy.shops;
         Connection conn = shops.getConnection();
-
         //TODO: Remove Debug or limit to OPs
+        player.setHeldItem(EnumHand.MAIN_HAND, null); //TODO: 1.11 update null
     }
 
     @Command
     public static void sc_sql(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException, SQLException {
-        if(SCConfig.Shops.disable_sc_sql) new CommandException(lang.getKey("sc_sql.disabled"));
+        if (SCConfig.Shops.disable_sc_sql) new CommandException(lang.getKey("sc_sql.disabled"));
         if (!isOp(sender)) new CommandException(NOT_OP);
 
         final ShopHelper shops = SpontaneousCollection.proxy.shops;
@@ -97,7 +102,7 @@ public class Commands {
             server.logWarning(sender.getName()
                     + " used sc_sql. Query: " + sql
                     + " Results: " + String.join("\n", components.stream().map((tc) -> tc.getFormattedText()).toArray((len) -> new String[len])));
-            SyncHelper.addScheduledTask(false, () -> {
+            SyncHelper.addScheduledTaskOrRunNow(false, () -> {
                 components.forEach(sender::addChatMessage);
             });
         });
@@ -139,7 +144,7 @@ public class Commands {
             } catch (SQLException e) {
                 components.add(LangHelper.NO_PREFIX.getTextComponent(e));
             }
-            SyncHelper.addScheduledTask(false, () -> {
+            SyncHelper.addScheduledTaskOrRunNow(false, () -> {
                 components.forEach(sender::addChatMessage);
             });
         });

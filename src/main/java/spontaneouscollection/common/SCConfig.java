@@ -44,7 +44,7 @@ public class SCConfig {
         public static boolean threads_enabled = true;
 
         @Comment("Max size of the Thread Pool")
-        @RangeInt(min=1,max=10)
+        @RangeInt(min = 1, max = 10)
         public static int threads_count = 5;
     }
 }
