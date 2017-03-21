@@ -4,7 +4,10 @@ import net.minecraftforge.common.DimensionManager;
 import org.sqlite.JDBC;
 import org.sqlite.SQLiteConnection;
 
+import javax.annotation.Nullable;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.sql.*;
 import java.util.Enumeration;
 
@@ -118,6 +121,42 @@ public class SQLiteHelper {
             func.run();
             return false;
         });
+    }
+
+    /**
+     * False if failed to compare blobs
+     *
+     * @param a
+     * @param b
+     * @return
+     */
+    public static boolean compareBlob(Blob a, Blob b) throws SQLException {
+        long len = a.length();
+        if (b.length() != len) return false;
+        try (InputStream bsa = a.getBinaryStream()) {
+            try (InputStream bsb = b.getBinaryStream()) {
+                return StreamHelper.compare(bsa, bsb);
+            }
+        } catch (IOException e) {
+            throw new SQLException("Failed to compare blobs", e);
+        }
+    }
+
+    /**
+     * Gets bytes contained in the blob
+     * If null, then it destroys
+     *
+     * @param b
+     * @return
+     */
+    @Nullable
+    public static byte[] getBytes(Blob b) throws SQLException {
+        if (b == null) return null;
+        try (InputStream in = b.getBinaryStream()) {
+            return StreamHelper.readBytes(in);
+        } catch (IOException e) {
+            throw new SQLException("Failed to get bytes from blob", e);
+        }
     }
 
     public interface ISQLFunction<E> {

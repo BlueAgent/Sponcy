@@ -46,5 +46,15 @@ public class SCConfig {
         @Comment("Max size of the Thread Pool")
         @RangeInt(min = 1, max = 10)
         public static int threads_count = 5;
+
+        //TODO: Implement
+        @Comment("Maximum amount of a unique item that can be stored inside the database per owner. (Not enforced by database)")
+        @RangeInt(min = 64, max = 1048576)
+        public static int item_max_amount = 1024;
+
+        //TODO: Implement
+        @Comment("Maximum unique items that can be stored inside the database per owner. (Not enforced by database)")
+        @RangeInt(min = 1, max = 1024)
+        public static int item_max_types = 64;
     }
 }

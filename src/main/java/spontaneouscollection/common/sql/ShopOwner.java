@@ -14,7 +14,7 @@ import static spontaneouscollection.common.helper.ShopHelper.TABLE_OWNER;
 
 public class ShopOwner {
     public static final String SQL_INSERT_OR_UPDATE_OWNER =
-            "insert or replace into " + TABLE_OWNER + " (`uuid`, `name`) values(?, ?)";
+            "insert or replace into `" + TABLE_OWNER + "` (`uuid`, `name`) values(?, ?)";
     public static final String SQL_SELECT_WHERE_ID =
             "select * from `" + TABLE_OWNER + "` WHERE id=?";
     public static final String SQL_SELECT_WHERE_UUID =
@@ -22,7 +22,7 @@ public class ShopOwner {
     public static final String SQL_SELECT_All =
             "select * from `" + TABLE_OWNER + "`";
     public static final String SQL_TRANSFER_MONEY =
-            "update `Shops`.`ShopOwner` set money=case" +
+            "update `" + TABLE_OWNER + "` set money=case" +
                     "when id=? then money-?" +
                     "when id=? then money+?" +
                     "else money end" +
@@ -33,7 +33,7 @@ public class ShopOwner {
     protected String name;
     protected long money;
 
-    public ShopOwner(ShopHelper shop, int id, UUID uuid, String name, long money) throws SQLException {
+    protected ShopOwner(ShopHelper shop, int id, UUID uuid, String name, long money) throws SQLException {
         this.shop = shop;
         this.id = id;
         this.uuid = uuid;
@@ -60,13 +60,7 @@ public class ShopOwner {
         });
     }
 
-    public static ShopOwner get(ShopHelper shop, EntityPlayer player) throws SQLException {
-        UUID uuid = PlayerHelper.getUUID(player);
-        String name = player.getName();
-        return get(shop, uuid, name);
-    }
-
-    public static ShopOwner get(ShopHelper shop, final UUID uuid, final String name) throws SQLException {
+    public static ShopOwner get(final ShopHelper shop, final UUID uuid, final String name) throws SQLException {
         Connection conn = shop.getConnection();
         return SQLiteHelper.rollbackAndThrowWithCommit(conn, () -> {
             int id;
@@ -94,6 +88,12 @@ public class ShopOwner {
             select.close();
             return new ShopOwner(shop, id, uuid, name, money);
         });
+    }
+
+    public static ShopOwner get(ShopHelper shop, EntityPlayer player) throws SQLException {
+        UUID uuid = PlayerHelper.getUUID(player);
+        String name = player.getName();
+        return get(shop, uuid, name);
     }
 
     public static List<ShopOwner> getAll(ShopHelper shop) throws SQLException {
