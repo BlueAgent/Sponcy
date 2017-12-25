@@ -3,6 +3,8 @@ package spontaneouscollection.common.helper;
 import net.minecraft.entity.player.EntityPlayer;
 import spontaneouscollection.SpontaneousCollection;
 import spontaneouscollection.common.SCConfig;
+import spontaneouscollection.common.data.DataItemStack;
+import spontaneouscollection.common.sql.ShopItem;
 import spontaneouscollection.common.sql.ShopOwner;
 
 import javax.annotation.Nonnull;
@@ -56,8 +58,11 @@ public class ShopHelper implements Closeable, ThreadFactory {
     protected Semaphore connectionSema = new Semaphore(SEMA_MAX);
     protected ConcurrentHashMap<Thread, Connection> connections = new ConcurrentHashMap<>();
     protected Thread connectionCleanupThread;
-    protected Map<UUID, ShopOwner> owners_uuid = new HashMap<>();
+
     protected Map<Integer, ShopOwner> owners_id = new HashMap<>();
+    protected Map<UUID, ShopOwner> owners_uuid = new HashMap<>();
+    protected Map<Integer, ShopItem> items_id = new HashMap<>();
+    protected Map<DataItemStack, ShopItem> items_stack = new HashMap<>();
 
     public ShopHelper() {
         connectionCleanupThread = new Thread(this::connectionCleanupThread);
@@ -190,10 +195,24 @@ public class ShopHelper implements Closeable, ThreadFactory {
 
     public void initShops() throws SQLException {
         execute(SQLS_CREATE_TABLES);
+        //ShopOwner
         for (ShopOwner owner : ShopOwner.getAll(this)) {
-            owners_id.put(owner.getId(), owner);
-            owners_uuid.put(owner.getUuid(), owner);
+            insertOwner(owner);
         }
+        //ShopItem
+        for (ShopItem item : ShopItem.getAll(this)) {
+
+        }
+    }
+
+    protected void insertOwner(ShopOwner owner) {
+        owners_id.put(owner.getId(), owner);
+        owners_uuid.put(owner.getUuid(), owner);
+    }
+
+    protected void insertItem(ShopItem item) {
+        items_id.put(item.getId(), item);
+        items_stack.put(item.getStack(), item);
     }
 
     //ShopOwner methods
@@ -252,5 +271,15 @@ public class ShopHelper implements Closeable, ThreadFactory {
         if (owner != null) return owner;
 
         throw new SQLException("0 name~=" + name);
+    }
+
+    //ShopItem Methods
+    public ShopItem getItem(int id) throws SQLException {
+        ShopItem item = items_id.get(id);
+        if (item != null) return item;
+        item = ShopItem.get(this, id);
+        owners_id.put(item.getId(), item);
+        owners_uuid.put(item.getUuid(), item);
+        return item;
     }
 }

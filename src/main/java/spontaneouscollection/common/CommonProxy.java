@@ -14,6 +14,7 @@ import spontaneouscollection.SpontaneousCollection;
 import spontaneouscollection.common.command.Commands;
 import spontaneouscollection.common.helper.ShopHelper;
 import spontaneouscollection.common.item.ItemMendingCharm;
+import spontaneouscollection.common.item.ItemShopManager;
 import spontaneouscollection.common.recipe.RecipeMendingCharm;
 
 import java.sql.SQLException;
@@ -32,6 +33,7 @@ public abstract class CommonProxy {
     public void registerItems(RegistryEvent.Register<Item> event) {
         List<Item> reg = new ArrayList<>();
         reg.add(new ItemMendingCharm());
+        reg.add(new ItemShopManager());
         event.getRegistry().registerAll(reg.toArray(new Item[0]));
     }
 

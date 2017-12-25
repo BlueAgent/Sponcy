@@ -57,10 +57,12 @@ public class Commands {
         if (stack == null) {
             throw new CommandException(lang.getKey("sc_insert.missing"));
         }
-        ShopHelper shops = SpontaneousCollection.proxy.shops;
-        Connection conn = shops.getConnection();
         //TODO: Remove Debug or limit to OPs
         player.setHeldItem(EnumHand.MAIN_HAND, null); //TODO: 1.11 update null
+
+        ShopHelper shops = SpontaneousCollection.proxy.shops;
+        Connection conn = shops.getConnection();
+
     }
 
     @Command

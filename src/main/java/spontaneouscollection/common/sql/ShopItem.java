@@ -6,6 +6,7 @@ import spontaneouscollection.common.helper.NBTHelper;
 import spontaneouscollection.common.helper.SQLiteHelper;
 import spontaneouscollection.common.helper.ShopHelper;
 
+import javax.annotation.Nonnull;
 import javax.sql.rowset.serial.SerialBlob;
 import java.io.IOException;
 import java.io.InputStream;
@@ -40,11 +41,11 @@ public class ShopItem {
         this.owner = owner;
         this.item_id = item_id;
         this.meta = meta;
-        this.nbt = nbt.copy();
+        this.nbt = nbt == null ? null : nbt.copy();
         this.amount = 0;
     }
 
-    public static ShopItem get(ShopHelper shop, final int owner, final String item_id, final int meta, final NBTTagCompound nbt) throws SQLException {
+    public static ShopItem get(ShopHelper shop, final int owner, @Nonnull final String item_id, final int meta, final NBTTagCompound nbt) throws SQLException {
         Connection conn = shop.getConnection();
         final Blob nbtblob;
         try {
@@ -60,11 +61,11 @@ public class ShopItem {
                 insert.setInt(1, owner);
                 insert.setString(2, item_id);
                 insert.setInt(3, meta);
-                if (nbtblob == null) {
-                    insert.setNull(4, Types.BLOB);
-                } else {
-                    insert.setBlob(4, nbtblob);
-                }
+                //if (nbtblob == null) {
+                //    insert.setNull(4, Types.BLOB);
+                //} else {
+                insert.setBlob(4, nbtblob);
+                //}
                 insert.execute();
             }
             //Get the actual information
@@ -123,5 +124,37 @@ public class ShopItem {
                 return items;
             }
         }
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public ShopOwner getOwner() throws SQLException {
+        return shop.getOwner(getOwnerId());
+    }
+
+    public int getOwnerId() {
+        return owner;
+    }
+
+    public ShopHelper getShop() {
+        return shop;
+    }
+
+    public String getItemId() {
+        return item_id;
+    }
+
+    public int getMeta() {
+        return meta;
+    }
+
+    public NBTTagCompound getNbt() {
+        return nbt.copy();
+    }
+
+    public int getAmount() {
+        return amount;
     }
 }

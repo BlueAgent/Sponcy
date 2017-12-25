@@ -71,15 +71,18 @@ public class SQLiteHelper {
         return connect(new File(saveDirectory, databaseName));
     }
 
-    public static int[] execute(Connection conn, boolean commit, String... sqls) throws SQLException {
-        conn.setAutoCommit(false);
-        Statement s = conn.createStatement();
-        for (String sql : sqls)
-            s.addBatch(sql);
-        int[] result = s.executeBatch();
-        s.close();
-        if (commit) conn.commit();
-        return result;
+    public static int[] execute(Connection conn, boolean docommit, String... sqls) throws SQLException {
+        boolean commit = conn.getAutoCommit();
+        if (docommit) conn.setAutoCommit(false);
+        try (Statement s = conn.createStatement()) {
+            for (String sql : sqls)
+                s.addBatch(sql);
+            int[] result = s.executeBatch();
+            return result;
+        } finally {
+            if (docommit) conn.commit();
+            conn.setAutoCommit(commit);
+        }
     }
 
     public static int[] execute(Connection conn, String... sqls) throws SQLException {
@@ -104,6 +107,7 @@ public class SQLiteHelper {
     }
 
     public static <T> T rollbackAndThrowWithCommit(Connection conn, ISQLFunction<T> func) throws SQLException {
+        boolean commit = conn.getAutoCommit();
         conn.setAutoCommit(false);
         Savepoint save = conn.setSavepoint();
         try {
@@ -113,6 +117,8 @@ public class SQLiteHelper {
         } catch (SQLException e) {
             conn.rollback(save);
             throw e;
+        } finally {
+            conn.setAutoCommit(commit);
         }
     }
 
