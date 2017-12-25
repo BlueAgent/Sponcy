@@ -2,6 +2,7 @@ package spontaneouscollection.common.sql;
 
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
+import spontaneouscollection.common.data.DataItemStack;
 import spontaneouscollection.common.helper.NBTHelper;
 import spontaneouscollection.common.helper.SQLiteHelper;
 import spontaneouscollection.common.helper.ShopHelper;
@@ -43,6 +44,32 @@ public class ShopItem {
         this.meta = meta;
         this.nbt = nbt == null ? null : nbt.copy();
         this.amount = 0;
+    }
+
+    private static ShopItem get(ShopHelper shop, ResultSet result) throws SQLException {
+        return new ShopItem(shop,
+                result.getInt("id"),
+                result.getInt("owner"),
+                result.getString("item_id"),
+                result.getInt("meta"),
+                NBTHelper.fromBlob(result.getBlob("nbt")),
+                result.getInt("amount")
+        );
+    }
+
+    public static ShopItem get(ShopHelper shop, final int id) throws SQLException {
+        Connection conn = shop.getConnection();
+        return SQLiteHelper.rollbackAndThrowWithCommit(conn, () -> {
+            try (PreparedStatement select = conn.prepareStatement(SQL_SELECT_WHERE_ID)) {
+                select.setInt(1, id);
+                select.execute();
+                try (ResultSet result = select.executeQuery()) {
+                    if (!result.next()) throw new SQLException(String.format("Item with id=%d could not be found", id));
+                    assert id == result.getInt("id");
+                    return get(shop, result);
+                }
+            }
+        });
     }
 
     public static ShopItem get(ShopHelper shop, final int owner, @Nonnull final String item_id, final int meta, final NBTTagCompound nbt) throws SQLException {
@@ -90,7 +117,6 @@ public class ShopItem {
                     if (!SQLiteHelper.compareBlob(result.getBlob("nbt"), nbtblob)) {
                         throw new SQLException("NBT was not updated?");
                     }
-                    amount = result.getInt("amount");
                     return new ShopItem(shop, id, owner, item_id, meta, nbt, amount);
                 }
             }
@@ -157,4 +183,10 @@ public class ShopItem {
     public int getAmount() {
         return amount;
     }
+
+    public DataItemStack getStack() {
+        return new DataItemStack(this.getItemId(), this.getMeta(), this.getNbt());
+    }
+
+
 }

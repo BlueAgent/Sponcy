@@ -278,8 +278,8 @@ public class ShopHelper implements Closeable, ThreadFactory {
         ShopItem item = items_id.get(id);
         if (item != null) return item;
         item = ShopItem.get(this, id);
-        owners_id.put(item.getId(), item);
-        owners_uuid.put(item.getUuid(), item);
+        owners_id.put(item.getId(), item.getOwner());
+        owners_uuid.put(item.getOwner().getUuid(), item.getOwner());
         return item;
     }
 }

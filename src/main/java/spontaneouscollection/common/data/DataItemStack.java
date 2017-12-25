@@ -14,7 +14,7 @@ public class DataItemStack {
     protected final int meta;
     protected final NBTTagCompound nbt;
 
-    protected DataItemStack(String id, int meta, NBTTagCompound nbt) {
+    public DataItemStack(String id, int meta, NBTTagCompound nbt) {
         this.id = id;
         this.meta = meta;
         this.nbt = nbt.copy();
