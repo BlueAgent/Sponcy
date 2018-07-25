@@ -1,10 +1,14 @@
 package spontaneouscollection.common.item;
 
+import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
 import net.minecraft.init.Enchantments;
 import net.minecraft.inventory.Slot;
+import net.minecraft.item.EnumAction;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
@@ -15,6 +19,7 @@ import spontaneouscollection.common.SCConfig.MendingCharm;
 import spontaneouscollection.common.helper.CostHelper;
 import spontaneouscollection.common.helper.EnchantHelper;
 import spontaneouscollection.common.helper.ExperienceHelper;
+import spontaneouscollection.common.helper.ItemHelper;
 
 import java.util.LinkedList;
 
@@ -58,7 +63,7 @@ public class ItemMendingCharm extends ItemBase {
             //Exclude the crafting slots
             if (slot.slotNumber < 5) continue;
             ItemStack itemStack = slot.getStack();
-            if (itemStack == null) continue; //TODO: 1.11 update null check
+            if (itemStack.isEmpty()) continue;
             //Make sure it is using metadata for durability
             if (!itemStack.isItemDamaged()) continue;
             //Check if it has Mending
@@ -88,13 +93,27 @@ public class ItemMendingCharm extends ItemBase {
         }
         ExperienceHelper.addXp(player, (int) -xpRequired);
         if (MendingCharm.debug)
-            player.addChatComponentMessage(new TextComponentString(
+            player.sendMessage(new TextComponentString(
                     String.format("%dxp => %d/%d", (int) xpRequired, (int) costHelper.getTotal(), (int) durabilityToRepair)
             ));
     }
 
     @Override
-    public EnumActionResult onItemUse(ItemStack stack, EntityPlayer playerIn, World worldIn, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+    public EnumActionResult onItemUse(EntityPlayer player, World worldIn, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+        Block light = Blocks.GLOWSTONE;
+        int slot;
+        if(pos != null && facing != null && (slot = player.inventory.getSlotFor(new ItemStack(Blocks.GLOWSTONE))) >= 0) {
+            worldIn.setBlockState(pos.offset(facing), light.getDefaultState());
+            player.inventory.decrStackSize(slot, 1);
+        }
+        ItemStack stack = player.getActiveItemStack();
+        if(stack.getTagCompound() == null) stack.setTagCompound(new NBTTagCompound());
+        System.out.println(stack.getTagCompound().getBoolean("test"));
         return EnumActionResult.PASS;
+    }
+
+    @Override
+    public EnumAction getItemUseAction(ItemStack stack) {
+        return EnumAction.NONE;
     }
 }

@@ -33,8 +33,8 @@ public class Commands {
 
     @Command
     public static void sc_test(MinecraftServer server, ICommandSender sender, String[] args) {
-        sender.addChatMessage(lang.getTextComponent("sc_test.message", String.join(" ", args)));
-        sender.addChatMessage(new TextComponentString("isFake: " + PlayerHelper.isFake(sender)));
+        sender.sendMessage(lang.getTextComponent("sc_test.message", String.join(" ", args)));
+        sender.sendMessage(new TextComponentString("isFake: " + PlayerHelper.isFake(sender)));
     }
 
     @Command
@@ -53,12 +53,12 @@ public class Commands {
         if (!(sender instanceof EntityPlayer)) throw new CommandException(lang.getKey("exception.not_a_player"));
         EntityPlayer player = (EntityPlayer) sender;
         final ItemStack stack = player.getHeldItemMainhand();
-        //TODO: 1.11 update null
-        if (stack == null) {
+
+        if (stack.isEmpty()) {
             throw new CommandException(lang.getKey("sc_insert.missing"));
         }
         //TODO: Remove Debug or limit to OPs
-        player.setHeldItem(EnumHand.MAIN_HAND, null); //TODO: 1.11 update null
+        player.setHeldItem(EnumHand.MAIN_HAND, ItemStack.EMPTY);
 
         ShopHelper shops = SpontaneousCollection.proxy.shops;
         Connection conn = shops.getConnection();
@@ -105,7 +105,7 @@ public class Commands {
                     + " used sc_sql. Query: " + sql
                     + " Results: " + String.join("\n", components.stream().map((tc) -> tc.getFormattedText()).toArray((len) -> new String[len])));
             SyncHelper.addScheduledTaskOrRunNow(false, () -> {
-                components.forEach(sender::addChatMessage);
+                components.forEach(sender::sendMessage);
             });
         });
     }
@@ -147,7 +147,7 @@ public class Commands {
                 components.add(LangHelper.NO_PREFIX.getTextComponent(e));
             }
             SyncHelper.addScheduledTaskOrRunNow(false, () -> {
-                components.forEach(sender::addChatMessage);
+                components.forEach(sender::sendMessage);
             });
         });
     }
@@ -164,7 +164,7 @@ public class Commands {
     }
 
     public static boolean isOp(ICommandSender sender) {
-        return sender.canCommandSenderUseCommand(2, "");
+        return sender.canUseCommand(2, "");
     }
 
     @Retention(RetentionPolicy.RUNTIME)
@@ -215,12 +215,12 @@ public class Commands {
         }
 
         @Override
-        public String getCommandName() {
+        public String getName() {
             return name;
         }
 
         @Override
-        public String getCommandUsage(ICommandSender sender) {
+        public String getUsage(ICommandSender sender) {
             return prefix + usage;
         }
 

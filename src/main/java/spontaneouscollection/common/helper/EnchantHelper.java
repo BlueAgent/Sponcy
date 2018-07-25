@@ -20,8 +20,7 @@ public class EnchantHelper {
      * @return the input item stack with the enchantment added.
      */
     public static ItemStack addEnchantment(ItemStack itemStack, Enchantment enchantment, int level) {
-        //TODO: 1.11 update null item stack
-        if (itemStack == null) return itemStack;
+        if (itemStack.isEmpty()) return itemStack;
         if (level <= 0) return itemStack;
         Map<Enchantment, Integer> enchantments = EnchantmentHelper.getEnchantments(itemStack);
         if (!enchantments.containsKey(enchantment)) {
@@ -43,8 +42,7 @@ public class EnchantHelper {
      * @return the input item stack with the enchantment removed.
      */
     public static ItemStack removeEnchantment(ItemStack itemStack, Enchantment enchantment, int levels) {
-        //TODO: 1.11 update null item stack
-        if (itemStack == null) return itemStack;
+        if (itemStack.isEmpty()) return itemStack;
         Map<Enchantment, Integer> enchantments = EnchantmentHelper.getEnchantments(itemStack);
         if (!enchantments.containsKey(enchantment)) return itemStack;
         int level = Math.max(enchantments.remove(enchantment) - levels, 0);
@@ -68,11 +66,11 @@ public class EnchantHelper {
      * @return level of the enchantment.
      */
     public static int getEnchantmentLevel(ItemStack itemStack, Enchantment enchantment) {
-        //TODO: 1.11 update null item stack
-        if (itemStack == null) return 0;
+        if (itemStack.isEmpty()) return 0;
         if (itemStack.getItem() == null) return 0;
         //From Minecraft's EnchantmentHelper
-        NBTTagList nbttaglist = itemStack.getItem() == Items.ENCHANTED_BOOK ? Items.ENCHANTED_BOOK.getEnchantments(itemStack) : itemStack.getEnchantmentTagList();
+        //NBTTagList nbttaglist = itemStack.getItem() == Items.ENCHANTED_BOOK ? Items.ENCHANTED_BOOK.getEnchantments(itemStack) : itemStack.getEnchantmentTagList();
+        NBTTagList nbttaglist = itemStack.getEnchantmentTagList();
         if (nbttaglist == null) return 0;
 
         for (int i = 0; i < nbttaglist.tagCount(); ++i) {

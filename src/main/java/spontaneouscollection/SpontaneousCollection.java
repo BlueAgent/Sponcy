@@ -33,7 +33,7 @@ public class SpontaneousCollection {
     public static final String DEPENDENCIES = "";
     public static final boolean DEV_ENVIRONMENT = MOD_VERSION.equals("99999.999.999");
 
-    @SidedProxy(clientSide = "spontaneouscollection.client.ClientProxy", serverSide = "spontaneouscollection.server.ServerProxy")
+    @SidedProxy(clientSide = "spontaneouscollection.client.ClientProxy", serverSide = "spontaneouscollection.common.CommonProxy")
     public static CommonProxy proxy;
     public static LangHelper lang = new LangHelper(SpontaneousCollection.MOD_ID + ".");
 

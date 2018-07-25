@@ -5,8 +5,11 @@ import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
+import net.minecraft.util.NonNullList;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import spontaneouscollection.common.helper.EnchantHelper;
+import spontaneouscollection.common.helper.ItemHelper;
 import spontaneouscollection.common.registry.ItemRegistry;
 
 import javax.annotation.Nullable;
@@ -31,10 +34,8 @@ public class RecipeMendingCharm implements IRecipe {
         //Plus shape
         for (int i = 0; i < SLOTS_ITEMS.length; i++) {
             ItemStack itemStack = inv.getStackInSlot(SLOTS_ITEMS[i]);
-            //TODO: 1.11 update
-            if (itemStack == null) return false;
+            if (itemStack.isEmpty()) return false;
             Item item = itemStack.getItem();
-            if (item == null) return false;
             if (item != ITEMS[i]) return false;
         }
 
@@ -55,8 +56,8 @@ public class RecipeMendingCharm implements IRecipe {
     }
 
     @Override
-    public int getRecipeSize() {
-        return 9;
+    public boolean canFit(int width, int height) {
+        return width >= 3 && height >= 3;
     }
 
     @Nullable
@@ -66,18 +67,31 @@ public class RecipeMendingCharm implements IRecipe {
     }
 
     @Override
-    public ItemStack[] getRemainingItems(InventoryCrafting inv) {
-        //TODO: 1.11 update
-        ItemStack[] remaining = new ItemStack[9];
-
+    public NonNullList<ItemStack> getRemainingItems(InventoryCrafting inv) {
+        NonNullList<ItemStack> remaining = IRecipe.super.getRemainingItems(inv);
         //Corners
         for (int slot : SLOTS_MENDING) {
             //Should actually need to check this? Since the slots shouldn't be null
             ItemStack itemStack = inv.getStackInSlot(slot);
-            //TODO: 1.11 update
-            if (itemStack == null) continue;
-            remaining[slot] = EnchantHelper.removeEnchantment(itemStack.copy(), Enchantments.MENDING, 1);
+            if (itemStack.isEmpty()) continue;
+            remaining.set(slot, EnchantHelper.removeEnchantment(itemStack.copy(), Enchantments.MENDING, 1));
         }
         return remaining;
+    }
+
+    @Override
+    public IRecipe setRegistryName(ResourceLocation name) {
+        return null;
+    }
+
+    @Nullable
+    @Override
+    public ResourceLocation getRegistryName() {
+        return null;
+    }
+
+    @Override
+    public Class<IRecipe> getRegistryType() {
+        return null;
     }
 }
