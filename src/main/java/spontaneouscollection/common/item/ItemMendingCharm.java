@@ -100,20 +100,6 @@ public class ItemMendingCharm extends ItemBase {
 
     @Override
     public EnumActionResult onItemUse(EntityPlayer player, World worldIn, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
-        Block light = Blocks.GLOWSTONE;
-        int slot;
-        if(pos != null && facing != null && (slot = player.inventory.getSlotFor(new ItemStack(Blocks.GLOWSTONE))) >= 0) {
-            worldIn.setBlockState(pos.offset(facing), light.getDefaultState());
-            player.inventory.decrStackSize(slot, 1);
-        }
-        ItemStack stack = player.getActiveItemStack();
-        if(stack.getTagCompound() == null) stack.setTagCompound(new NBTTagCompound());
-        System.out.println(stack.getTagCompound().getBoolean("test"));
         return EnumActionResult.PASS;
-    }
-
-    @Override
-    public EnumAction getItemUseAction(ItemStack stack) {
-        return EnumAction.NONE;
     }
 }
