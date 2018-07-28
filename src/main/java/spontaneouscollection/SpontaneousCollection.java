@@ -12,6 +12,8 @@ import net.minecraftforge.fml.common.Mod.Instance;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.*;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import spontaneouscollection.common.CommonProxy;
 import spontaneouscollection.common.helper.LangHelper;
 import spontaneouscollection.common.helper.SQLiteHelper;
@@ -36,6 +38,7 @@ public class SpontaneousCollection {
     @SidedProxy(clientSide = "spontaneouscollection.client.ClientProxy", serverSide = "spontaneouscollection.common.CommonProxy")
     public static CommonProxy proxy;
     public static LangHelper lang = new LangHelper(SpontaneousCollection.MOD_ID + ".");
+    public static Logger log = LogManager.getLogger(MOD_ID);
 
     @Instance(MOD_ID)
     public static SpontaneousCollection INSTANCE;
@@ -93,6 +96,7 @@ public class SpontaneousCollection {
         System.out.println(String.format("Pre-Init %s", MOD_ID));
         System.out.println(String.format("Version %s", MOD_VERSION));
         System.out.println("Loaded SQLiteJDBC (by Taro L. Saito) at classpath: " + SQLiteHelper.load());
+        SpontaneousCollection.log = event.getModLog();
         proxy.preInit(event);
     }
 

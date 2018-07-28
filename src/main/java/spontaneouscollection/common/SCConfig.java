@@ -18,7 +18,7 @@ public class SCConfig {
         @RangeInt(min = 1, max = 60 * 20)
         public static int operation_time = 5 * 20;
 
-        @Comment("Total maximum durability per operation.\nMake sure this is greater than 'durability_per_xp' if 'repair_efficiently = true' or it will never repair anything.")
+        @Comment("Total maximum durability per operation.\nMake sure this is greater than or equal to 'durability_per_xp' if 'repair_efficiently = true' or it will never repair anything.")
         @RangeInt(min = 1, max = 1000000)
         public static int max_durability = 10000;
 
@@ -48,7 +48,7 @@ public class SCConfig {
         public static int threads_count = 5;
 
         //TODO: Implement
-        @Comment("Maximum amount of a unique item that can be stored inside the database per owner. (Not enforced by database)")
+        @Comment("Maximum amount of a unique items that can be stored inside the database per owner. (Not enforced by database)")
         @RangeInt(min = 64, max = 1048576)
         public static int item_max_amount = 1024;
 

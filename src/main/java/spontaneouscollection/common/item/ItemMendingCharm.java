@@ -97,9 +97,4 @@ public class ItemMendingCharm extends ItemBase {
                     String.format("%dxp => %d/%d", (int) xpRequired, (int) costHelper.getTotal(), (int) durabilityToRepair)
             ));
     }
-
-    @Override
-    public EnumActionResult onItemUse(EntityPlayer player, World worldIn, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
-        return EnumActionResult.PASS;
-    }
 }

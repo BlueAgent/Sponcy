@@ -3,8 +3,10 @@ package spontaneouscollection.common.helper;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.init.Items;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagList;
+import spontaneouscollection.common.registry.ItemRegistry;
 
 import java.util.Map;
 
@@ -79,5 +81,36 @@ public class EnchantHelper {
             return nbttaglist.getCompoundTagAt(i).getShort("lvl");
         }
         return 0;
+    }
+
+    /**
+     * Checks that current contains at least the required enchantments.
+     * @param current
+     * @param required
+     * @return
+     */
+    public static boolean checkEnchantments(Map<Enchantment, Integer> current, Map<Enchantment, Integer> required) {
+        if(current.size() < required.size()) return false;
+        if(!current.keySet().containsAll(required.keySet())) return false;
+        for(Map.Entry<Enchantment, Integer> entry : required.entrySet()) {
+            Integer requiredLevel = entry.getValue();
+            Integer currentLevel = current.get(entry.getKey());
+            if(requiredLevel == null) requiredLevel = 0;
+            if(currentLevel == null) currentLevel = 0;
+            if(currentLevel < requiredLevel) return false;
+        }
+        return true;
+    }
+
+    /**
+     * Create item with specified enchants.
+     * @param item
+     * @param enchantments
+     * @return
+     */
+    public static ItemStack createEnchantedItem(Item item, Map<Enchantment, Integer> enchantments) {
+        ItemStack stack = new ItemStack(item, 1);
+        EnchantmentHelper.setEnchantments(enchantments, stack);
+        return stack;
     }
 }

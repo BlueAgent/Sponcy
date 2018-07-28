@@ -1,4 +1,4 @@
-#general
+#General
 general.exception=[%s] %s
 
 #Commands
@@ -20,4 +20,7 @@ commands.sc_owner=Get owner
 commands.sc_owner.usage=[id/uuid/name]
 
 #Items
+item.dev_wand.name=Dev Wand
+item.enchanted_item.name=Enchanted Item
 item.mending_charm.name=Mending Charm
+item.shop_manager.name=Shop Manager

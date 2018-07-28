@@ -11,6 +11,8 @@ import net.minecraftforge.fml.common.event.*;
 import spontaneouscollection.SpontaneousCollection;
 import spontaneouscollection.common.command.Commands;
 import spontaneouscollection.common.helper.ShopHelper;
+import spontaneouscollection.common.item.ItemDevWand;
+import spontaneouscollection.common.item.ItemEnchantedItem;
 import spontaneouscollection.common.item.ItemMendingCharm;
 import spontaneouscollection.common.item.ItemShopManager;
 
@@ -29,6 +31,8 @@ public class CommonProxy {
 
     public void registerItems(RegistryEvent.Register<Item> event) {
         List<Item> reg = new ArrayList<>();
+        reg.add(new ItemDevWand());
+        reg.add(new ItemEnchantedItem());
         reg.add(new ItemMendingCharm());
         reg.add(new ItemShopManager());
         event.getRegistry().registerAll(reg.toArray(new Item[0]));
