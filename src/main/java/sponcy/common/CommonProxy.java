@@ -8,7 +8,7 @@ import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.event.*;
-import sponcy.SpontaneousCollection;
+import sponcy.Sponcy;
 import sponcy.common.command.Commands;
 import sponcy.common.helper.ShopHelper;
 import sponcy.common.item.ItemDevWand;
@@ -48,7 +48,7 @@ public class CommonProxy {
 
     public void init(FMLInitializationEvent event) {
         //TODO: FIX mending charm recipe
-//        if (SCConfig.MendingCharm.recipe)
+//        if (SponcyConfig.MendingCharm.recipe)
 //            GameRegistry.addRecipe(new RecipeMendingCharm(
 //                    Items.GOLD_INGOT,
 //                    Items.GOLD_INGOT, Items.EMERALD, Items.GOLD_INGOT,
@@ -70,7 +70,7 @@ public class CommonProxy {
             System.out.println("shops initialised");
         } catch (SQLException e) {
             RuntimeException re = new RuntimeException("Failed to create shops database", e);
-            if (SpontaneousCollection.DEV_ENVIRONMENT)
+            if (Sponcy.DEV_ENVIRONMENT)
                 re.printStackTrace();
             else
                 throw re;

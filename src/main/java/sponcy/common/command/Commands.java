@@ -7,8 +7,8 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
-import sponcy.SpontaneousCollection;
-import sponcy.common.SCConfig;
+import sponcy.Sponcy;
+import sponcy.common.SponcyConfig;
 import sponcy.common.helper.*;
 import sponcy.common.sql.ShopOwner;
 
@@ -60,17 +60,17 @@ public class Commands {
         //TODO: Remove Debug or limit to OPs
         player.setHeldItem(EnumHand.MAIN_HAND, ItemStack.EMPTY);
 
-        ShopHelper shops = SpontaneousCollection.proxy.shops;
+        ShopHelper shops = Sponcy.proxy.shops;
         Connection conn = shops.getConnection();
 
     }
 
     @Command
     public static void sc_sql(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException, SQLException {
-        if (SCConfig.Shops.disable_sc_sql) new CommandException(lang.getKey("sc_sql.disabled"));
+        if (SponcyConfig.Shops.disable_sc_sql) new CommandException(lang.getKey("sc_sql.disabled"));
         if (!isOp(sender)) new CommandException(NOT_OP);
 
-        final ShopHelper shops = SpontaneousCollection.proxy.shops;
+        final ShopHelper shops = Sponcy.proxy.shops;
         final String sql = String.join(" ", args);
 
         shops.run(() -> {
@@ -112,7 +112,7 @@ public class Commands {
 
     @Command
     public static void sc_owner(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException, SQLException {
-        final ShopHelper shops = SpontaneousCollection.proxy.shops;
+        final ShopHelper shops = Sponcy.proxy.shops;
         final SQLiteHelper.ISQLFunction<ShopOwner> method_temp;
         if (args.length == 0) {
             if (!(sender instanceof EntityPlayer))

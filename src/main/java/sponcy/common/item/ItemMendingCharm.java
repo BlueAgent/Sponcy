@@ -1,25 +1,16 @@
 package sponcy.common.item;
 
-import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
 import net.minecraft.init.Enchantments;
 import net.minecraft.inventory.Slot;
-import net.minecraft.item.EnumAction;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.EnumActionResult;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.World;
-import sponcy.common.SCConfig.MendingCharm;
+import sponcy.common.SponcyConfig.MendingCharm;
 import sponcy.common.helper.CostHelper;
 import sponcy.common.helper.EnchantHelper;
 import sponcy.common.helper.ExperienceHelper;
-import sponcy.common.helper.ItemHelper;
 
 import java.util.LinkedList;
 

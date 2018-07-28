@@ -1,8 +1,8 @@
 package sponcy.common.registry;
 
 import net.minecraftforge.fml.common.registry.GameRegistry;
-import sponcy.SpontaneousCollection;
+import sponcy.Sponcy;
 
-@GameRegistry.ObjectHolder(SpontaneousCollection.MOD_ID)
+@GameRegistry.ObjectHolder(Sponcy.MOD_ID)
 public class BlockRegistry {
 }

@@ -1,8 +1,8 @@
 package sponcy.common.helper;
 
 import net.minecraft.entity.player.EntityPlayer;
-import sponcy.SpontaneousCollection;
-import sponcy.common.SCConfig;
+import sponcy.Sponcy;
+import sponcy.common.SponcyConfig;
 import sponcy.common.data.DataItemStack;
 import sponcy.common.sql.ShopItem;
 import sponcy.common.sql.ShopOwner;
@@ -69,7 +69,7 @@ public class ShopHelper implements Closeable, ThreadFactory {
         connectionCleanupThread.setName("[SCShops] Connection Cleanup Thread");
         connectionCleanupThread.setDaemon(true);
         connectionCleanupThread.start();
-        executorService = Executors.newFixedThreadPool(SCConfig.Shops.threads_count, this);
+        executorService = Executors.newFixedThreadPool(SponcyConfig.Shops.threads_count, this);
     }
 
     /**
@@ -82,7 +82,7 @@ public class ShopHelper implements Closeable, ThreadFactory {
      * @param r to execute
      */
     public void run(Runnable r) {
-        if (SCConfig.Shops.threads_enabled)
+        if (SponcyConfig.Shops.threads_enabled)
             executorService.submit(r);
         else
             r.run();
@@ -97,7 +97,7 @@ public class ShopHelper implements Closeable, ThreadFactory {
 
     /**
      * The executor service.
-     * Please respect the SCConfig.Shops.threads_enabled config.
+     * Please respect the SponcyConfig.Shops.threads_enabled config.
      *
      * @return the executor service, always exists.
      */
@@ -123,7 +123,7 @@ public class ShopHelper implements Closeable, ThreadFactory {
         connectionSema.acquireUninterruptibly();
         try {
             if (closing) throw new SQLException("Connections closing...");
-            conn = SQLiteHelper.connect(SpontaneousCollection.MOD_ID, DB_FILE);
+            conn = SQLiteHelper.connect(Sponcy.MOD_ID, DB_FILE);
             conn.setAutoCommit(false);
             connections.put(t, conn);
         } finally {
