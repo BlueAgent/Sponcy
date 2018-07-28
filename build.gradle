@@ -36,7 +36,7 @@ minecraft {
     replaceIn "src/main/java/sponcy/Sponcy.java"
     replace "MOD_VERSION = \"99999.999.999\"", "MOD_VERSION = \"${mod_version}\""
     replace "MC_VERSION = \"\"", "MC_VERSION = \"[${mc_version}]\""
-    replace "DEPENDENCIES = \"\"", "DEPENDENCIES = \"required-after:Forge@[${forge_version},)\""
+    replace "DEPENDENCIES = \"\"", "DEPENDENCIES = \"required-after:forge@[${forge_version},)\""
 }
 
 dependencies {
@@ -81,8 +81,6 @@ processResources
 shadowJar {
     classifier = ""
     exclude "dummyThing"
-
-    relocate "org.sqlite", "sponcy.shaded.org.sqlite"
 
     dependencies {
         include(dependency("org.xerial:sqlite-jdbc:${sqlite_jdbc_version}"))
