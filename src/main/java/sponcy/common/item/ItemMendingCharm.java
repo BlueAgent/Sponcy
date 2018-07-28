@@ -1,4 +1,4 @@
-package spontaneouscollection.common.item;
+package sponcy.common.item;
 
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
@@ -15,11 +15,11 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.World;
-import spontaneouscollection.common.SCConfig.MendingCharm;
-import spontaneouscollection.common.helper.CostHelper;
-import spontaneouscollection.common.helper.EnchantHelper;
-import spontaneouscollection.common.helper.ExperienceHelper;
-import spontaneouscollection.common.helper.ItemHelper;
+import sponcy.common.SCConfig.MendingCharm;
+import sponcy.common.helper.CostHelper;
+import sponcy.common.helper.EnchantHelper;
+import sponcy.common.helper.ExperienceHelper;
+import sponcy.common.helper.ItemHelper;
 
 import java.util.LinkedList;
 

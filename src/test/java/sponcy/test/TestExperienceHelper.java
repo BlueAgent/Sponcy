@@ -1,7 +1,7 @@
-package spontaneouscollection.test;
+package sponcy.test;
 
 import org.junit.Test;
-import spontaneouscollection.common.helper.ExperienceHelper;
+import sponcy.common.helper.ExperienceHelper;
 
 import static org.junit.Assert.assertEquals;
 

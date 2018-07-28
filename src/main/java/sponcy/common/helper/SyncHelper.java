@@ -1,4 +1,4 @@
-package spontaneouscollection.common.helper;
+package sponcy.common.helper;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.World;

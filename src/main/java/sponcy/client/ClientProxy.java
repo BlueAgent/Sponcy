@@ -1,13 +1,13 @@
-package spontaneouscollection.client;
+package sponcy.client;
 
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.model.ModelLoader;
-import spontaneouscollection.SpontaneousCollection;
-import spontaneouscollection.common.CommonProxy;
-import spontaneouscollection.common.registry.ItemRegistry;
+import sponcy.SpontaneousCollection;
+import sponcy.common.CommonProxy;
+import sponcy.common.registry.ItemRegistry;
 
 import java.lang.reflect.Field;
 

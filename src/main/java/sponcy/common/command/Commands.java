@@ -1,4 +1,4 @@
-package spontaneouscollection.common.command;
+package sponcy.common.command;
 
 import net.minecraft.command.*;
 import net.minecraft.entity.player.EntityPlayer;
@@ -7,10 +7,10 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
-import spontaneouscollection.SpontaneousCollection;
-import spontaneouscollection.common.SCConfig;
-import spontaneouscollection.common.helper.*;
-import spontaneouscollection.common.sql.ShopOwner;
+import sponcy.SpontaneousCollection;
+import sponcy.common.SCConfig;
+import sponcy.common.helper.*;
+import sponcy.common.sql.ShopOwner;
 
 import java.lang.annotation.*;
 import java.lang.reflect.InvocationTargetException;

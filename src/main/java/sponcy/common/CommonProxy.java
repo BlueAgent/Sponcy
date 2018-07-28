@@ -1,4 +1,4 @@
-package spontaneouscollection.common;
+package sponcy.common;
 
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
@@ -8,13 +8,13 @@ import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.event.*;
-import spontaneouscollection.SpontaneousCollection;
-import spontaneouscollection.common.command.Commands;
-import spontaneouscollection.common.helper.ShopHelper;
-import spontaneouscollection.common.item.ItemDevWand;
-import spontaneouscollection.common.item.ItemEnchantedItem;
-import spontaneouscollection.common.item.ItemMendingCharm;
-import spontaneouscollection.common.item.ItemShopManager;
+import sponcy.SpontaneousCollection;
+import sponcy.common.command.Commands;
+import sponcy.common.helper.ShopHelper;
+import sponcy.common.item.ItemDevWand;
+import sponcy.common.item.ItemEnchantedItem;
+import sponcy.common.item.ItemMendingCharm;
+import sponcy.common.item.ItemShopManager;
 
 import java.sql.SQLException;
 import java.util.ArrayList;

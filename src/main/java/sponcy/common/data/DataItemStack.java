@@ -1,4 +1,4 @@
-package spontaneouscollection.common.data;
+package sponcy.common.data;
 
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;

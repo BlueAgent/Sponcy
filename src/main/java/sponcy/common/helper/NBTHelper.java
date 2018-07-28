@@ -1,4 +1,4 @@
-package spontaneouscollection.common.helper;
+package sponcy.common.helper;
 
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;

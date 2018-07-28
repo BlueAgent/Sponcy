@@ -1,9 +1,9 @@
-package spontaneouscollection.common.sql;
+package sponcy.common.sql;
 
 import net.minecraft.entity.player.EntityPlayer;
-import spontaneouscollection.common.helper.PlayerHelper;
-import spontaneouscollection.common.helper.SQLiteHelper;
-import spontaneouscollection.common.helper.ShopHelper;
+import sponcy.common.helper.PlayerHelper;
+import sponcy.common.helper.SQLiteHelper;
+import sponcy.common.helper.ShopHelper;
 
 import java.sql.*;
 import java.util.ArrayList;

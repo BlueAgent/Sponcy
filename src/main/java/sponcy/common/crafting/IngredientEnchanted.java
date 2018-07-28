@@ -1,4 +1,4 @@
-package spontaneouscollection.common.crafting;
+package sponcy.common.crafting;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.JsonElement;
@@ -11,8 +11,8 @@ import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.crafting.IIngredientFactory;
 import net.minecraftforge.common.crafting.JsonContext;
-import spontaneouscollection.common.helper.EnchantHelper;
-import spontaneouscollection.common.registry.ItemRegistry;
+import sponcy.common.helper.EnchantHelper;
+import sponcy.common.registry.ItemRegistry;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;

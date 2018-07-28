@@ -1,11 +1,11 @@
-package spontaneouscollection.common.sql;
+package sponcy.common.sql;
 
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
-import spontaneouscollection.common.data.DataItemStack;
-import spontaneouscollection.common.helper.NBTHelper;
-import spontaneouscollection.common.helper.SQLiteHelper;
-import spontaneouscollection.common.helper.ShopHelper;
+import sponcy.common.data.DataItemStack;
+import sponcy.common.helper.NBTHelper;
+import sponcy.common.helper.SQLiteHelper;
+import sponcy.common.helper.ShopHelper;
 
 import javax.annotation.Nonnull;
 import javax.sql.rowset.serial.SerialBlob;

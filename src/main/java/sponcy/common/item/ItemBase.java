@@ -1,8 +1,8 @@
-package spontaneouscollection.common.item;
+package sponcy.common.item;
 
 import net.minecraft.item.Item;
-import spontaneouscollection.SpontaneousCollection;
-import spontaneouscollection.common.helper.StringHelper;
+import sponcy.SpontaneousCollection;
+import sponcy.common.helper.StringHelper;
 
 public abstract class ItemBase extends Item {
 

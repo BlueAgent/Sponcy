@@ -1,4 +1,4 @@
-package spontaneouscollection;
+package sponcy;
 
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
@@ -14,9 +14,9 @@ import net.minecraftforge.fml.common.event.*;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import spontaneouscollection.common.CommonProxy;
-import spontaneouscollection.common.helper.LangHelper;
-import spontaneouscollection.common.helper.SQLiteHelper;
+import sponcy.common.CommonProxy;
+import sponcy.common.helper.LangHelper;
+import sponcy.common.helper.SQLiteHelper;
 
 @Mod(
         modid = SpontaneousCollection.MOD_ID,

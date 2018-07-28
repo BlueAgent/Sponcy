@@ -1,7 +1,7 @@
-package spontaneouscollection.common;
+package sponcy.common;
 
 import net.minecraftforge.common.config.Config;
-import spontaneouscollection.SpontaneousCollection;
+import sponcy.SpontaneousCollection;
 
 import static net.minecraftforge.common.config.Config.*;
 

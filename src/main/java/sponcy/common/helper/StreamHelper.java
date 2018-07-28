@@ -1,4 +1,4 @@
-package spontaneouscollection.common.helper;
+package sponcy.common.helper;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

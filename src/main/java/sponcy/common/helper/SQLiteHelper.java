@@ -1,4 +1,4 @@
-package spontaneouscollection.common.helper;
+package sponcy.common.helper;
 
 import net.minecraftforge.common.DimensionManager;
 import org.sqlite.JDBC;

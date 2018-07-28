@@ -1,4 +1,4 @@
-package spontaneouscollection.common.item;
+package sponcy.common.item;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.EnumAction;

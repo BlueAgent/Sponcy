@@ -1,11 +1,11 @@
-package spontaneouscollection.common.helper;
+package sponcy.common.helper;
 
 import net.minecraft.entity.player.EntityPlayer;
-import spontaneouscollection.SpontaneousCollection;
-import spontaneouscollection.common.SCConfig;
-import spontaneouscollection.common.data.DataItemStack;
-import spontaneouscollection.common.sql.ShopItem;
-import spontaneouscollection.common.sql.ShopOwner;
+import sponcy.SpontaneousCollection;
+import sponcy.common.SCConfig;
+import sponcy.common.data.DataItemStack;
+import sponcy.common.sql.ShopItem;
+import sponcy.common.sql.ShopOwner;
 
 import javax.annotation.Nonnull;
 import java.io.Closeable;

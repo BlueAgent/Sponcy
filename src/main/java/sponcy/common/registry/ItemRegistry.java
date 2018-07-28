@@ -1,11 +1,11 @@
-package spontaneouscollection.common.registry;
+package sponcy.common.registry;
 
 import net.minecraftforge.fml.common.registry.GameRegistry;
-import spontaneouscollection.SpontaneousCollection;
-import spontaneouscollection.common.item.ItemDevWand;
-import spontaneouscollection.common.item.ItemEnchantedItem;
-import spontaneouscollection.common.item.ItemMendingCharm;
-import spontaneouscollection.common.item.ItemShopManager;
+import sponcy.SpontaneousCollection;
+import sponcy.common.item.ItemDevWand;
+import sponcy.common.item.ItemEnchantedItem;
+import sponcy.common.item.ItemMendingCharm;
+import sponcy.common.item.ItemShopManager;
 
 @GameRegistry.ObjectHolder(SpontaneousCollection.MOD_ID)
 public class ItemRegistry {
