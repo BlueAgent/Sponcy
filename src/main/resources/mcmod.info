@@ -1,15 +1,15 @@
 [
 {
-  "modid": "spontaneouscollection",
-  "name": "Spontaneous Collection",
+  "modid": "sponcy",
+  "name": "Sponcy",
   "description": "For learning how to mod Minecraft, and for testing new ideas.",
   "version": "${version}",
   "mcversion": "${mcversion}",
-  "url": "https://github.com/BlueAgent/Spontaneous-Collection",
+  "url": "https://github.com/BlueAgent/Sponcy",
   "updateUrl": "",
   "authorList": ["BlueAgent"],
   "credits": "Mojang for Minecraft.\nForge Team for Minecraft Forge.\nAE2 Team, HellFirePVP, LexManos, Vazkii, WayOfTime, Saereth, ShadowFacts for modding examples.\nSQLiteJDBC by Taro L. Saito.",
-  "logoFile": "assets/spontaneouscollection/logo.png",
+  "logoFile": "assets/sponcy/logo.png",
   "screenshots": [],
   "dependencies": []
 }

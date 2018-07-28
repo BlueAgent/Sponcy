@@ -15,7 +15,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-import static spontaneouscollection.common.helper.ShopHelper.TABLE_ITEM;
+import static sponcy.common.helper.ShopHelper.TABLE_ITEM;
 
 public class ShopItem {
     public static final String SQL_INSERT_OR_UPDATE_ITEM =

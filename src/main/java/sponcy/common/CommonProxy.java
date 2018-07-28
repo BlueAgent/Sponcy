@@ -47,13 +47,7 @@ public class CommonProxy {
     }
 
     public void init(FMLInitializationEvent event) {
-        //TODO: FIX mending charm recipe
-//        if (SponcyConfig.MendingCharm.recipe)
-//            GameRegistry.addRecipe(new RecipeMendingCharm(
-//                    Items.GOLD_INGOT,
-//                    Items.GOLD_INGOT, Items.EMERALD, Items.GOLD_INGOT,
-//                    Items.GOLD_INGOT
-//            ));
+
     }
 
     public void postInit(FMLPostInitializationEvent event) {

@@ -20,7 +20,7 @@ import sponcy.common.helper.SQLiteHelper;
 
 @Mod(
         modid = Sponcy.MOD_ID,
-        name = "Spontaneous Collection",
+        name = "Sponcy",
         version = Sponcy.MOD_VERSION,
         acceptedMinecraftVersions = Sponcy.MC_VERSION,
         clientSideOnly = false,
@@ -29,13 +29,13 @@ import sponcy.common.helper.SQLiteHelper;
 )
 @Mod.EventBusSubscriber
 public class Sponcy {
-    public static final String MOD_ID = "spontaneouscollection";
+    public static final String MOD_ID = "sponcy";
     public static final String MOD_VERSION = "99999.999.999";
     public static final String MC_VERSION = "";
     public static final String DEPENDENCIES = "";
     public static final boolean DEV_ENVIRONMENT = MOD_VERSION.equals("99999.999.999");
 
-    @SidedProxy(clientSide = "spontaneouscollection.client.ClientProxy", serverSide = "spontaneouscollection.common.CommonProxy")
+    @SidedProxy(clientSide = MOD_ID + ".client.ClientProxy", serverSide = MOD_ID + ".common.CommonProxy")
     public static CommonProxy proxy;
     public static LangHelper lang = new LangHelper(Sponcy.MOD_ID + ".");
     public static Logger log = LogManager.getLogger(MOD_ID);

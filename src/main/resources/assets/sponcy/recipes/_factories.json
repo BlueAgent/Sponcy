@@ -1,5 +1,5 @@
 {
   "ingredients": {
-    "enchanted": "spontaneouscollection.common.crafting.IngredientEnchanted$Factory"
+    "enchanted": "sponcy.common.crafting.IngredientEnchanted$Factory"
   }
 }

@@ -8,7 +8,7 @@
   ],
   "key": {
     "M": {
-      "type": "spontaneouscollection:enchanted",
+      "type": "sponcy:enchanted",
       "enchantments": {
         "minecraft:mending": 1
       }
@@ -21,6 +21,6 @@
     }
   },
   "result": {
-    "item": "spontaneouscollection:mending_charm"
+    "item": "sponcy:mending_charm"
   }
 }

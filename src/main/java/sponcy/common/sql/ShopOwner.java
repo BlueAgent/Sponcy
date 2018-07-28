@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import static spontaneouscollection.common.helper.ShopHelper.TABLE_OWNER;
+import static sponcy.common.helper.ShopHelper.TABLE_OWNER;
 
 public class ShopOwner {
     public static final String SQL_INSERT_OR_UPDATE_OWNER =
