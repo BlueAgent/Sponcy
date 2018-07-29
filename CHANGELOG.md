@@ -5,6 +5,7 @@
 - Changed Mending Charm default config to repair 1 durability per tick instead of 10000 every 5 seconds.
 - Removed config for disabling Mending Charm recipe (since it now uses resources pack system for the recipe instead of a custom recipe).
 - Mending Charm now has an animation for when it's repairing stuff.
+- Config can now be reloaded in game
 
 ## [0.1.0] - 2018-07-28
 - Updated to Minecraft 1.12.2
