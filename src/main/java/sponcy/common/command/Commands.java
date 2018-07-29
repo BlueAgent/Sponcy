@@ -1,17 +1,23 @@
 package sponcy.common.command;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.resources.SimpleReloadableResourceManager;
 import net.minecraft.command.*;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
+import net.minecraftforge.fml.client.FMLClientHandler;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import sponcy.Sponcy;
 import sponcy.common.SponcyConfig;
 import sponcy.common.helper.*;
 import sponcy.common.sql.ShopOwner;
 
+import java.io.IOException;
 import java.lang.annotation.*;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -45,6 +51,21 @@ public class Commands {
     @Command
     public static void sc_exception(MinecraftServer server, ICommandSender sender, String[] args) {
         throw new RuntimeException("Oh noes, something broke.");
+    }
+
+    @Command
+    public static void sc_reload(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
+        if(FMLCommonHandler.instance().getSide().isClient()) {
+            Minecraft mc = FMLClientHandler.instance().getClient();
+            mc.addScheduledTask(() -> {
+                try {
+                    SimpleReloadableResourceManager manager = (SimpleReloadableResourceManager) mc.getResourceManager();
+                    manager.reloadResourcePack(FMLClientHandler.instance().getResourcePackFor(Sponcy.MOD_ID));
+                } catch (ClassCastException cce) {
+                    Sponcy.log.error("Expected a SimpleReloadableResourceManager", cce);
+                }
+            });
+        }
     }
 
     //TODO: Make it put into into the network

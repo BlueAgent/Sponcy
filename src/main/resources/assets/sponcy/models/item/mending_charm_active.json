@@ -1,0 +1,7 @@
+{
+  "parent": "item/generated",
+  "textures": {
+    "layer0": "sponcy:items/mending_charm",
+    "layer1": "sponcy:items/mending_charm_active"
+  }
+}

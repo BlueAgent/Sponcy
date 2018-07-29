@@ -2,5 +2,13 @@
   "parent": "item/generated",
   "textures": {
     "layer0": "sponcy:items/mending_charm"
-  }
+  },
+  "overrides": [
+    {
+      "predicate": {
+        "sponcy:active": 1
+      },
+      "model": "sponcy:item/mending_charm_active"
+    }
+  ]
 }
