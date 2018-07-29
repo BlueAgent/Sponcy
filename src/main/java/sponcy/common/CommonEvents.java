@@ -2,7 +2,10 @@ package sponcy.common;
 
 import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.common.config.Config;
+import net.minecraftforge.common.config.ConfigManager;
 import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.fml.client.event.ConfigChangedEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
@@ -31,5 +34,15 @@ public class CommonEvents {
                         Sponcy.log.warn("Failed to map " + m.key + ". " + newKey + " does not exist.");
                     }
                 });
+    }
+
+    /**
+     * Sync Configuration
+     * @param event Configuration changed
+     */
+    @SubscribeEvent
+    public static void onConfigChanged(ConfigChangedEvent.OnConfigChangedEvent event) {
+        if(!event.getModID().equals(Sponcy.MOD_ID)) return;
+        ConfigManager.sync(Sponcy.MOD_ID, Config.Type.INSTANCE);
     }
 }

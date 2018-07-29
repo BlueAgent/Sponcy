@@ -7,6 +7,12 @@ import static net.minecraftforge.common.config.Config.*;
 
 @Config(modid = Sponcy.MOD_ID)
 public class SponcyConfig {
+    //TODO: Think about how to update the config
+    @Ignore
+    public static final int CONFIG_VERSION = 0;
+    @Comment("Used internally to update the config. Do not change.")
+    public static int version = CONFIG_VERSION;
+
     public static General general;
     public static MendingCharm mending_charm;
     public static Shops shops;
