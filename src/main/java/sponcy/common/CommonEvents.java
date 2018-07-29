@@ -17,6 +17,7 @@ public class CommonEvents {
 
     /**
      * For converting from the old mod id "spontaneouscollection"
+     *
      * @param event Missing mapping data for items
      */
     @SubscribeEvent
@@ -27,7 +28,7 @@ public class CommonEvents {
                 .forEach(m -> {
                     ResourceLocation newKey = new ResourceLocation(Sponcy.MOD_ID, m.key.getResourcePath());
                     Item target = ForgeRegistries.ITEMS.getValue(newKey);
-                    if(target != null) {
+                    if (target != null) {
                         Sponcy.log.info(m.key + " -> " + newKey);
                         m.remap(target);
                     } else {
@@ -38,11 +39,12 @@ public class CommonEvents {
 
     /**
      * Sync Configuration
+     *
      * @param event Configuration changed
      */
     @SubscribeEvent
     public static void onConfigChanged(ConfigChangedEvent.OnConfigChangedEvent event) {
-        if(!event.getModID().equals(Sponcy.MOD_ID)) return;
+        if (!event.getModID().equals(Sponcy.MOD_ID)) return;
         ConfigManager.sync(Sponcy.MOD_ID, Config.Type.INSTANCE);
     }
 }

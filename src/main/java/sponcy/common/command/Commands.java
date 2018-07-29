@@ -7,20 +7,15 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.EnumHand;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
-import net.minecraftforge.common.config.Config;
-import net.minecraftforge.common.config.ConfigManager;
 import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraftforge.fml.common.FMLCommonHandler;
-import net.minecraftforge.fml.common.Loader;
 import sponcy.Sponcy;
 import sponcy.common.SponcyConfig;
 import sponcy.common.helper.*;
 import sponcy.common.sql.ShopOwner;
 
-import java.io.IOException;
 import java.lang.annotation.*;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -58,7 +53,7 @@ public class Commands {
 
     @Command
     public static void sc_reload(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
-        if(FMLCommonHandler.instance().getSide().isClient()) {
+        if (FMLCommonHandler.instance().getSide().isClient()) {
             Minecraft mc = FMLClientHandler.instance().getClient();
             mc.addScheduledTask(() -> {
                 try {

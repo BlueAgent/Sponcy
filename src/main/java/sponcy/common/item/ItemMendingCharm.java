@@ -6,7 +6,6 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Enchantments;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.World;
@@ -34,10 +33,6 @@ public class ItemMendingCharm extends ItemBase {
         addPropertyOverride(new ResourceLocation(Sponcy.MOD_ID, "active"), (stack, world, entity) -> isActive(stack) ? 1 : 0);
     }
 
-    private boolean isActive(ItemStack stack) {
-        return ItemHelper.getCommonTagHelper(stack).getInteger(TAG_ACTIVE, 0) > 0;
-    }
-
     public static double getDurabilityFromXp(double experience) {
         return experience * MendingCharm.durability_per_xp;
     }
@@ -46,14 +41,18 @@ public class ItemMendingCharm extends ItemBase {
         return durability / MendingCharm.durability_per_xp;
     }
 
+    private boolean isActive(ItemStack stack) {
+        return ItemHelper.getCommonTagHelper(stack).getInteger(TAG_ACTIVE, 0) > 0;
+    }
+
     @Override
     public void onUpdate(ItemStack stack, World worldIn, Entity entityIn, int itemSlot, boolean isSelected) {
         if (worldIn.isRemote) return;
         if (!(entityIn instanceof EntityPlayer)) return;
-        NBTHelper tag =  ItemHelper.getCommonTagHelper(stack);
+        NBTHelper tag = ItemHelper.getCommonTagHelper(stack);
         boolean didRepair = false;
-        if(worldIn.getTotalWorldTime() % MendingCharm.operation_time == 0) {
-            didRepair = doRepairs((EntityPlayer) entityIn,tag);
+        if (worldIn.getTotalWorldTime() % MendingCharm.operation_time == 0) {
+            didRepair = doRepairs((EntityPlayer) entityIn, tag);
         }
         tag.setInteger(TAG_ACTIVE, Math.max(0, didRepair ? TICKS_ACTIVE : tag.getInteger(TAG_ACTIVE, 0) - 1));
     }
@@ -125,7 +124,7 @@ public class ItemMendingCharm extends ItemBase {
 
     @Override
     public double getDurabilityForDisplay(ItemStack stack) {
-        if(MendingCharm.durability_per_xp >= 1.0) {
+        if (MendingCharm.durability_per_xp >= 1.0) {
             return 1.0d - (ItemHelper.getCommonTagHelper(stack).getDouble(TAG_REMAINING_DURABILITY, 0) / MendingCharm.durability_per_xp);
         } else {
             return 1.0d - (ItemHelper.getCommonTagHelper(stack).getDouble(TAG_REMAINING_DURABILITY, 0));
@@ -135,8 +134,8 @@ public class ItemMendingCharm extends ItemBase {
     @Override
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
         super.addInformation(stack, worldIn, tooltip, flagIn);
-        if(!SponcyConfig.MendingCharm.debug) return;
-        if(MendingCharm.durability_per_xp >= 1.0) {
+        if (!SponcyConfig.MendingCharm.debug) return;
+        if (MendingCharm.durability_per_xp >= 1.0) {
             tooltip.add(String.format("%f/%f", ItemHelper.getCommonTagHelper(stack).getDouble(TAG_REMAINING_DURABILITY, 0), MendingCharm.durability_per_xp));
         } else {
             tooltip.add(String.format("%f%%", ItemHelper.getCommonTagHelper(stack).getDouble(TAG_REMAINING_DURABILITY, 0) * 100));
@@ -146,7 +145,7 @@ public class ItemMendingCharm extends ItemBase {
 
     @Override
     public boolean shouldCauseReequipAnimation(ItemStack oldStack, ItemStack newStack, boolean slotChanged) {
-        if(!slotChanged && newStack.getItem() == this && oldStack.getItem() == newStack.getItem())
+        if (!slotChanged && newStack.getItem() == this && oldStack.getItem() == newStack.getItem())
             return false;
         return super.shouldCauseReequipAnimation(oldStack, newStack, slotChanged);
     }

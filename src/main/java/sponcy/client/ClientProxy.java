@@ -17,7 +17,7 @@ public class ClientProxy extends CommonProxy {
         for (Field f : ItemRegistry.class.getDeclaredFields()) {
             try {
                 Item item = (Item) f.get(null);
-                if(item == null) {
+                if (item == null) {
                     Sponcy.log.info("Item not registered: " + f.getName());
                     continue;
                 }

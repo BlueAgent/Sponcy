@@ -2,10 +2,11 @@ package sponcy.common.helper;
 
 import net.minecraft.crash.CrashReport;
 import net.minecraft.crash.CrashReportCategory;
-import net.minecraft.crash.ICrashReportDetail;
-import net.minecraft.nbt.*;
+import net.minecraft.nbt.CompressedStreamTools;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
+import net.minecraft.nbt.NBTTagLongArray;
 import net.minecraft.util.ReportedException;
-import net.minecraftforge.common.util.Constants;
 import sponcy.Sponcy;
 import sponcy.common.SponcyConfig;
 
@@ -14,76 +15,16 @@ import java.io.*;
 import java.sql.Blob;
 import java.sql.SQLException;
 import java.util.EnumSet;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class NBTHelper {
-    // From NBTBase.createNewByType(int)
-    public enum NBTTagType {
-        END(0),
-        BYTE(1),
-        SHORT(2),
-        INT(3),
-        LONG(4),
-        FLOAT(5),
-        DOUBLE(6),
-        BYTE_ARRAY(7),
-        STRING(8),
-        LIST(9),
-        COMPOUND(10),
-        INT_ARRAY(11),
-        LONG_ARRAY(12);
-
-        static final Map<Integer, NBTTagType> map = EnumSet.allOf(NBTTagType.class).stream()
-                .collect(Collectors.toMap(NBTTagType::getId, Function.identity()));
-        final int id;
-
-        NBTTagType(int id) {
-            this.id = id;
-        }
-
-        public int getId() {
-            return this.id;
-        }
-
-        public static String describe(int id) {
-            return (map.containsKey(id) ? map.get(id).toString() : "Unknown") + "(" + id + ")";
-        }
-    }
-
     private final NBTTagCompound tag;
 
     private NBTHelper(NBTTagCompound tag) {
         this.tag = tag;
     }
-
-    public NBTTagCompound getInternal() {
-        return tag;
-    }
-
-    private boolean checkKey(String key, NBTTagType type) {
-        return checkKey(key, type.getId());
-    }
-
-    private boolean checkKey(String key, int type) {
-        if(tag.hasKey(key, type)) return true;
-        // Has key, but of the wrong type
-        if(tag.hasKey(key)) {
-            RuntimeException ex = new RuntimeException("Expected " + NBTTagType.describe(type) + " but got " + NBTTagType.describe(tag.getTagId(key)) + " for key " + key);
-            if(SponcyConfig.General.default_invalid_nbt) {
-                // Log it but don't crash
-                Sponcy.log.error(ex);
-            } else {
-                // CRASH!
-                throw new ReportedException(createCrashReport(tag, key, type, ex));
-            }
-        }
-        return false;
-    }
-
-    // STATIC METHODS
 
     public static NBTHelper wrap(NBTTagCompound tag) {
         return new NBTHelper(tag);
@@ -113,6 +54,8 @@ public class NBTHelper {
         }
     }
 
+    // STATIC METHODS
+
     public static NBTTagCompound fromByteArrayCompressed(@Nonnull byte[] input) throws IOException {
         try (ByteArrayInputStream in = new ByteArrayInputStream(input)) {
             return CompressedStreamTools.readCompressed(in);
@@ -130,8 +73,7 @@ public class NBTHelper {
     /**
      * From NBTTagCompound.java createCrashReport
      */
-    public static CrashReport createCrashReport(final NBTTagCompound tag, final String key, final int expectedType, RuntimeException ex)
-    {
+    public static CrashReport createCrashReport(final NBTTagCompound tag, final String key, final int expectedType, RuntimeException ex) {
         CrashReport crashreport = CrashReport.makeCrashReport(ex, "Reading NBT data");
         CrashReportCategory crashreportcategory = crashreport.makeCategoryDepth("Corrupt NBT tag", 1);
         crashreportcategory.addDetail("Tag type found", () -> NBTTagType.describe(tag.getTagId(key)));
@@ -140,19 +82,43 @@ public class NBTHelper {
         return crashreport;
     }
 
-    // Mirror of used NBTTagCompound methods
-
-    public boolean getBoolean(String key, boolean def) {
-        return getByte(key, (byte)(def ? 1 : 0)) != 0;
+    public NBTTagCompound getInternal() {
+        return tag;
     }
 
+    private boolean checkKey(String key, NBTTagType type) {
+        return checkKey(key, type.getId());
+    }
+
+    private boolean checkKey(String key, int type) {
+        if (tag.hasKey(key, type)) return true;
+        // Has key, but of the wrong type
+        if (tag.hasKey(key)) {
+            RuntimeException ex = new RuntimeException("Expected " + NBTTagType.describe(type) + " but got " + NBTTagType.describe(tag.getTagId(key)) + " for key " + key);
+            if (SponcyConfig.General.default_invalid_nbt) {
+                // Log it but don't crash
+                Sponcy.log.error(ex);
+            } else {
+                // CRASH!
+                throw new ReportedException(createCrashReport(tag, key, type, ex));
+            }
+        }
+        return false;
+    }
+
+    public boolean getBoolean(String key, boolean def) {
+        return getByte(key, (byte) (def ? 1 : 0)) != 0;
+    }
+
+    // Mirror of used NBTTagCompound methods
+
     public NBTHelper setBoolean(String key, boolean val) {
-        tag.setByte(key,(byte)(val ? 1 : 0));
+        tag.setByte(key, (byte) (val ? 1 : 0));
         return this;
     }
 
     public byte getByte(String key, byte def) {
-        if(!checkKey(key, NBTTagType.BYTE))
+        if (!checkKey(key, NBTTagType.BYTE))
             tag.setByte(key, def);
         return tag.getByte(key);
     }
@@ -163,7 +129,7 @@ public class NBTHelper {
     }
 
     public int getShort(String key, short def) {
-        if(!checkKey(key, NBTTagType.SHORT))
+        if (!checkKey(key, NBTTagType.SHORT))
             tag.setShort(key, def);
         return tag.getShort(key);
     }
@@ -174,7 +140,7 @@ public class NBTHelper {
     }
 
     public int getInteger(String key, int def) {
-        if(!checkKey(key, NBTTagType.INT))
+        if (!checkKey(key, NBTTagType.INT))
             tag.setInteger(key, def);
         return tag.getInteger(key);
     }
@@ -185,7 +151,7 @@ public class NBTHelper {
     }
 
     public long getLong(String key, long def) {
-        if(!checkKey(key, NBTTagType.LONG))
+        if (!checkKey(key, NBTTagType.LONG))
             tag.setLong(key, def);
         return tag.getLong(key);
     }
@@ -199,7 +165,7 @@ public class NBTHelper {
     }
 
     public float getFloat(String key, float def) {
-        if(!checkKey(key, NBTTagType.FLOAT))
+        if (!checkKey(key, NBTTagType.FLOAT))
             tag.setFloat(key, def);
         return tag.getFloat(key);
     }
@@ -213,7 +179,7 @@ public class NBTHelper {
     }
 
     public double getDouble(String key, double def) {
-        if(!checkKey(key, NBTTagType.DOUBLE))
+        if (!checkKey(key, NBTTagType.DOUBLE))
             tag.setDouble(key, def);
         return tag.getDouble(key);
     }
@@ -227,7 +193,7 @@ public class NBTHelper {
     }
 
     public byte[] getByteArray(String key, byte[] def) {
-        if(!checkKey(key, NBTTagType.BYTE_ARRAY))
+        if (!checkKey(key, NBTTagType.BYTE_ARRAY))
             tag.setByteArray(key, def);
         return tag.getByteArray(key);
     }
@@ -241,7 +207,7 @@ public class NBTHelper {
     }
 
     public String getString(String key, String def) {
-        if(!checkKey(key, NBTTagType.STRING))
+        if (!checkKey(key, NBTTagType.STRING))
             tag.setString(key, def);
         return tag.getString(key);
     }
@@ -255,13 +221,14 @@ public class NBTHelper {
     }
 
     public NBTTagList getList(String key, NBTTagType type) {
-        if(!checkKey(key, NBTTagType.LIST))
+        if (!checkKey(key, NBTTagType.LIST))
             tag.setTag(key, new NBTTagList());
         return tag.getTagList(key, type.getId());
     }
 
     /**
      * Probably shouldn't use this?
+     *
      * @return self
      */
     public NBTHelper setList(String key, NBTTagList val) {
@@ -270,13 +237,14 @@ public class NBTHelper {
     }
 
     public NBTHelper getCompound(String key) {
-        if(!checkKey(key, NBTTagType.COMPOUND))
+        if (!checkKey(key, NBTTagType.COMPOUND))
             tag.setTag(key, new NBTTagCompound());
         return wrap(tag.getCompoundTag(key));
     }
 
     /**
      * Probably shouldn't use this?
+     *
      * @return self
      */
     public NBTHelper setCompound(String key, NBTTagCompound val) {
@@ -285,7 +253,7 @@ public class NBTHelper {
     }
 
     public int[] getIntArray(String key, int[] def) {
-        if(!checkKey(key, NBTTagType.INT))
+        if (!checkKey(key, NBTTagType.INT))
             tag.setIntArray(key, def);
         return tag.getIntArray(key);
     }
@@ -300,7 +268,7 @@ public class NBTHelper {
 
     // Are these even used?
     public NBTTagLongArray getLongArray(String key, long[] def) {
-        if(!checkKey(key, NBTTagType.INT))
+        if (!checkKey(key, NBTTagType.INT))
             tag.setTag(key, new NBTTagLongArray(def).copy());
         return (NBTTagLongArray) tag.getTag(key);
     }
@@ -311,5 +279,38 @@ public class NBTHelper {
     public NBTHelper setLongArray(String key, NBTTagLongArray val) {
         tag.setTag(key, val);
         return this;
+    }
+
+    // From NBTBase.createNewByType(int)
+    public enum NBTTagType {
+        END(0),
+        BYTE(1),
+        SHORT(2),
+        INT(3),
+        LONG(4),
+        FLOAT(5),
+        DOUBLE(6),
+        BYTE_ARRAY(7),
+        STRING(8),
+        LIST(9),
+        COMPOUND(10),
+        INT_ARRAY(11),
+        LONG_ARRAY(12);
+
+        static final Map<Integer, NBTTagType> map = EnumSet.allOf(NBTTagType.class).stream()
+                .collect(Collectors.toMap(NBTTagType::getId, Function.identity()));
+        final int id;
+
+        NBTTagType(int id) {
+            this.id = id;
+        }
+
+        public static String describe(int id) {
+            return (map.containsKey(id) ? map.get(id).toString() : "Unknown") + "(" + id + ")";
+        }
+
+        public int getId() {
+            return this.id;
+        }
     }
 }

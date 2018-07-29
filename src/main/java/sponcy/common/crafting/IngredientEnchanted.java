@@ -43,7 +43,7 @@ public class IngredientEnchanted extends Ingredient {
         public Ingredient parse(JsonContext context, JsonObject json) {
             Map<Enchantment, Integer> enchantments = new LinkedHashMap<>();
             JsonObject enchantmentsObj = json.getAsJsonObject("enchantments");
-            if(enchantmentsObj == null)
+            if (enchantmentsObj == null)
                 throw new JsonParseException("Missing enchantments.");
             for (Map.Entry<String, JsonElement> entry : enchantmentsObj.entrySet()) {
                 Enchantment enchantment = Enchantment.REGISTRY.getObject(new ResourceLocation(context.appendModId(entry.getKey())));

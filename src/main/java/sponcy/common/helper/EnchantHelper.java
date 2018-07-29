@@ -6,7 +6,6 @@ import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagList;
-import sponcy.common.registry.ItemRegistry;
 
 import java.util.Map;
 
@@ -85,25 +84,27 @@ public class EnchantHelper {
 
     /**
      * Checks that current contains at least the required enchantments.
+     *
      * @param current
      * @param required
      * @return
      */
     public static boolean checkEnchantments(Map<Enchantment, Integer> current, Map<Enchantment, Integer> required) {
-        if(current.size() < required.size()) return false;
-        if(!current.keySet().containsAll(required.keySet())) return false;
-        for(Map.Entry<Enchantment, Integer> entry : required.entrySet()) {
+        if (current.size() < required.size()) return false;
+        if (!current.keySet().containsAll(required.keySet())) return false;
+        for (Map.Entry<Enchantment, Integer> entry : required.entrySet()) {
             Integer requiredLevel = entry.getValue();
             Integer currentLevel = current.get(entry.getKey());
-            if(requiredLevel == null) requiredLevel = 0;
-            if(currentLevel == null) currentLevel = 0;
-            if(currentLevel < requiredLevel) return false;
+            if (requiredLevel == null) requiredLevel = 0;
+            if (currentLevel == null) currentLevel = 0;
+            if (currentLevel < requiredLevel) return false;
         }
         return true;
     }
 
     /**
      * Create item with specified enchants.
+     *
      * @param item
      * @param enchantments
      * @return

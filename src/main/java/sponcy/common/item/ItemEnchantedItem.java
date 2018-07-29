@@ -12,8 +12,7 @@ import java.util.List;
 public class ItemEnchantedItem extends ItemBase {
     @Override
     @SideOnly(Side.CLIENT)
-    public void addInformation(ItemStack stack, @Nullable World worldIn, List<String> tooltip, ITooltipFlag flagIn)
-    {
+    public void addInformation(ItemStack stack, @Nullable World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
         //TODO: Maybe add a tooltip?
     }
 }
