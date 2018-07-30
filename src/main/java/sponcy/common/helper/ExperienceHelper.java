@@ -40,7 +40,7 @@ public class ExperienceHelper {
      * Returns the total experience needed to reach the level.
      * Calculated from summation of arithmetic series of {@see net.minecraft.entity.player.EntityPlayer#xpBarCap()}.
      * Maximum level is 21863 with an experience of 2147407943.
-     * O(N)
+     * O(1)
      *
      * @param level to achieve.
      * @return experience to reach desired level.
