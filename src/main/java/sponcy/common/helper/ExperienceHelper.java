@@ -22,6 +22,7 @@ public class ExperienceHelper {
 
     /**
      * Get the total experience of the player.
+     *
      * @param player target player
      * @return total fractional experience
      */
@@ -63,7 +64,7 @@ public class ExperienceHelper {
             amount = maxDecrease;
 
         int total = player.experienceTotal + amount;
-        if(!simulate) {
+        if (!simulate) {
             player.experienceTotal = total;
             player.experienceLevel = levelAtXp(total);
             player.experience = (float) (total - xpAtLevel(player.experienceLevel)) / player.xpBarCap();

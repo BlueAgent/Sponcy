@@ -17,13 +17,15 @@ public interface IExperienceFractional {
 
     /**
      * Maximum experience that can be stored. (Typically Integer.MAX_VALUE)
+     *
      * @return Maximum experience.
      */
     double getMaxExperience();
 
     /**
      * Modify experience. Returns experience stored or taken.
-     * @param amount Amount of experience to add (or remove if negative)
+     *
+     * @param amount   Amount of experience to add (or remove if negative)
      * @param simulate if True experience change will be simulated
      * @return Resulting change in experience
      */

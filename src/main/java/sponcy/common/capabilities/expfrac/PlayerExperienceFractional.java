@@ -34,7 +34,7 @@ public class PlayerExperienceFractional implements IExperienceFractional {
     public double addExperience(double amount, boolean simulate) {
         double oldExp = player.experienceTotal + frac;
         double newExp = Math.min(Math.max(oldExp + amount, 0), MAX_EXPERIENCE);
-        if(!simulate) {
+        if (!simulate) {
             int playerExp = newExp >= Integer.MAX_VALUE ? Integer.MAX_VALUE : (int) newExp;
             player.experienceTotal = playerExp;
             player.experienceLevel = levelAtXp(playerExp);

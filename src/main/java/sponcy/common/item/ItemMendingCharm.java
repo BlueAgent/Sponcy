@@ -1,6 +1,5 @@
 package sponcy.common.item;
 
-import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Enchantments;
@@ -10,15 +9,13 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.World;
 import sponcy.Sponcy;
-import sponcy.common.SponcyConfig;
 import sponcy.common.SponcyConfig.MendingCharm;
-import sponcy.common.helper.*;
+import sponcy.common.helper.EnchantHelper;
+import sponcy.common.helper.ExperienceHelper;
+import sponcy.common.helper.ItemHelper;
+import sponcy.common.helper.NBTHelper;
 
-import javax.annotation.Nullable;
 import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.List;
 
 
 /**
@@ -49,7 +46,7 @@ public class ItemMendingCharm extends ItemBase {
             didRepair = doRepairs((EntityPlayer) entityIn, tag);
         }
         tag.setInteger(TAG_ACTIVE, Math.max(0, didRepair ? TICKS_ACTIVE : tag.getInteger(TAG_ACTIVE, 0) - 1));
-     }
+    }
 
     public boolean doRepairs(EntityPlayer player, NBTHelper tag) {
         //Find all items to repair
@@ -81,12 +78,12 @@ public class ItemMendingCharm extends ItemBase {
         //TODO: Sort items by getXpRepairRatio (durability per exp point, higher values first) (in 1.14+?)
         itemsToRepair.sort((a, b) -> 0);
 
-        if(itemsToRepair.isEmpty()) return false;
+        if (itemsToRepair.isEmpty()) return false;
 
         //Repair items
         int totalDurabilityRepaired = 0;
         double totalExperienceUsed = 0;
-        for(ItemStack itemStack : itemsToRepair) {
+        for (ItemStack itemStack : itemsToRepair) {
             // TODO: Replace 2 with getXpRepairRatio later
             double duraPerExp = MendingCharm.durability_per_xp * 0.5 * 2;
             // Get durability that can be repaired

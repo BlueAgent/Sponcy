@@ -1,7 +1,5 @@
 package sponcy.common.capabilities.expfrac;
 
-import sponcy.Sponcy;
-
 /**
  * Reference implementation for fractional experience storage.
  * Really it should be split between the player's experience level (int) and the capability storage
@@ -14,6 +12,7 @@ public class ExperienceFractional implements IExperienceFractional {
 
     /**
      * Recommended to not be more than Integer.MAX_VALUE
+     *
      * @param maxExperience max amount of experience
      */
     public ExperienceFractional(double maxExperience) {
@@ -39,7 +38,7 @@ public class ExperienceFractional implements IExperienceFractional {
     public double addExperience(double amount, boolean simulate) {
         double oldExp = experience;
         double newExp = Math.min(Math.max(oldExp + amount, 0), maxExperience);
-        if(!simulate) {
+        if (!simulate) {
             experience = newExp;
         }
         return newExp - oldExp;

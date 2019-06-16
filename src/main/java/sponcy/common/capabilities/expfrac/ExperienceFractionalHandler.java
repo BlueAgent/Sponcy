@@ -14,7 +14,6 @@ import net.minecraftforge.common.capabilities.ICapabilitySerializable;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import sponcy.Sponcy;
-import sponcy.common.capabilities.SponcyCapabilities;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -35,7 +34,7 @@ public class ExperienceFractionalHandler {
 
             @Override
             public void readNBT(Capability<IExperienceFractional> capability, IExperienceFractional instance, EnumFacing side, NBTBase nbt) {
-                if(!(instance instanceof ExperienceFractional))
+                if (!(instance instanceof ExperienceFractional))
                     throw new IllegalArgumentException("Can not deserialize to an instance that isn't the default implementation");
                 ((ExperienceFractional) instance).experience = ((NBTTagDouble) nbt).getDouble();
             }
@@ -46,9 +45,9 @@ public class ExperienceFractionalHandler {
 
     @SubscribeEvent
     public static void attachEntityCapability(AttachCapabilitiesEvent<Entity> e) {
-        if(e.getObject() instanceof EntityPlayer) {
+        if (e.getObject() instanceof EntityPlayer) {
             final PlayerExperienceFractional inst = new PlayerExperienceFractional((EntityPlayer) e.getObject());
-            e.addCapability(KEY, new ICapabilitySerializable<NBTTagDouble>(){
+            e.addCapability(KEY, new ICapabilitySerializable<NBTTagDouble>() {
                 @Override
                 public NBTTagDouble serializeNBT() {
                     return new NBTTagDouble(inst.frac);
