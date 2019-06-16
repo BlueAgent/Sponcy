@@ -1,6 +1,10 @@
 package sponcy.common.helper;
 
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
+import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.CapabilityInject;
+import sponcy.common.capabilities.expfrac.IExperienceFractional;
 
 public class ExperienceHelper {
 
@@ -13,14 +17,43 @@ public class ExperienceHelper {
     public static final int TYPICAL_LEVEL = 3000;
     public static final int TYPICAL_LEVEL_XP = xpAtLevel(3000); //40014720
 
+    @CapabilityInject(IExperienceFractional.class)
+    public static Capability<IExperienceFractional> EXPERIENCE_FRACTIONAL_CAPABILITY;
+
+    /**
+     * Get the total experience of the player.
+     * @param player target player
+     * @return total fractional experience
+     */
+    public static double getXp(EntityPlayer player) {
+        IExperienceFractional inst = (IExperienceFractional) player.getCapability(EXPERIENCE_FRACTIONAL_CAPABILITY, null);
+        assert inst != null;
+        return inst.getExperience();
+    }
+
     /**
      * Adds or removes experience from the player, checks bounds.
      *
-     * @param player to add or take exp from.
-     * @param amount positive to add, negative to take.
+     * @param player   to add or take exp from.
+     * @param amount   positive to add, negative to take.
+     * @param simulate If true, exp change will only be simulated
      * @return the actual change in experience points.
      */
-    public static int addXp(EntityPlayer player, int amount) {
+    public static double addXp(EntityPlayer player, double amount, boolean simulate) {
+        IExperienceFractional inst = (IExperienceFractional) player.getCapability(EXPERIENCE_FRACTIONAL_CAPABILITY, null);
+        assert inst != null;
+        return inst.addExperience(amount, simulate);
+    }
+
+    /**
+     * Adds or removes experience from the player, checks bounds.
+     *
+     * @param player   to add or take exp from.
+     * @param amount   positive to add, negative to take.
+     * @param simulate If true, exp change will only be simulated
+     * @return the actual change in experience points.
+     */
+    public static int addXp(EntityPlayer player, int amount, boolean simulate) {
         int maxIncrease = Integer.MAX_VALUE - player.experienceTotal;
         if (maxIncrease < amount)
             amount = maxIncrease;
@@ -30,10 +63,16 @@ public class ExperienceHelper {
             amount = maxDecrease;
 
         int total = player.experienceTotal + amount;
-        player.experienceTotal = total;
-        player.experienceLevel = levelAtXp(total);
-        player.experience = (float) (total - xpAtLevel(player.experienceLevel)) / player.xpBarCap();
+        if(!simulate) {
+            player.experienceTotal = total;
+            player.experienceLevel = levelAtXp(total);
+            player.experience = (float) (total - xpAtLevel(player.experienceLevel)) / player.xpBarCap();
+        }
         return amount;
+    }
+
+    public static float getXpRepairRatio(ItemStack itemStack) {
+        return 2f;
     }
 
     /**

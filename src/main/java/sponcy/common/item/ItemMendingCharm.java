@@ -15,6 +15,8 @@ import sponcy.common.SponcyConfig.MendingCharm;
 import sponcy.common.helper.*;
 
 import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -33,14 +35,6 @@ public class ItemMendingCharm extends ItemBase {
         addPropertyOverride(new ResourceLocation(Sponcy.MOD_ID, "active"), (stack, world, entity) -> isActive(stack) ? 1 : 0);
     }
 
-    public static double getDurabilityFromXp(double experience) {
-        return experience * MendingCharm.durability_per_xp;
-    }
-
-    public static double getXpFromDurability(double durability) {
-        return durability / MendingCharm.durability_per_xp;
-    }
-
     private boolean isActive(ItemStack stack) {
         return ItemHelper.getCommonTagHelper(stack).getInteger(TAG_ACTIVE, 0) > 0;
     }
@@ -55,92 +49,79 @@ public class ItemMendingCharm extends ItemBase {
             didRepair = doRepairs((EntityPlayer) entityIn, tag);
         }
         tag.setInteger(TAG_ACTIVE, Math.max(0, didRepair ? TICKS_ACTIVE : tag.getInteger(TAG_ACTIVE, 0) - 1));
-    }
+     }
 
     public boolean doRepairs(EntityPlayer player, NBTHelper tag) {
-        double durabilityRemainder = tag.getDouble(TAG_REMAINING_DURABILITY, 0);
-        int durabilityMaximum = (int) Math.min(getDurabilityFromXp(player.experienceTotal) + durabilityRemainder, MendingCharm.max_durability);
-        //Only attempt repairs if can repair at least 1 durability
-        if (durabilityMaximum < 1) return false;
-
         //Find all items to repair
         int totalDamage = 0;
-        LinkedList<ItemStack> queue = new LinkedList<>();
+        ArrayList<ItemStack> itemsToRepair = new ArrayList<>(player.inventoryContainer.inventorySlots.size());
         for (Slot slot : player.inventoryContainer.inventorySlots) {
-            //Stop searching after going over the limit
-            //Unless debug is on, in which case it checks all the items to find the actual durabilityToRepair
-            if (!MendingCharm.debug && totalDamage >= durabilityMaximum)
-                break;
             //Exclude the crafting slots
             if (slot.slotNumber < 5) continue;
             ItemStack itemStack = slot.getStack();
             if (itemStack.isEmpty()) continue;
             //Make sure it is using metadata for durability
             if (!itemStack.isItemDamaged()) continue;
+            //TODO: Filter out getXpRepairRatio <= 0 durability per xp (unrepairable)
             //Check if it has Mending
             if (MendingCharm.requires_mending && EnchantHelper.getEnchantmentLevel(itemStack, Enchantments.MENDING) == 0)
                 continue;
+            //TODO: Instantly repair getXpRepairRatio == Float.INFINITY but don't queue up
             //Enqueue
-            queue.addLast(itemStack);
+            itemsToRepair.add(itemStack);
             totalDamage += itemStack.getItemDamage();
         }
 
-        //Exit if there's nothing to repair
-        if (totalDamage <= 0) return false;
+        int durabilityMaximum = Math.min(MendingCharm.max_durability, totalDamage);
+        if (durabilityMaximum < 1) return false;
+        double startingExperience = ExperienceHelper.getXp(player);
+        double experienceMaximum = Math.min(MendingCharm.max_experience, startingExperience);
+        if (experienceMaximum <= 0) return false;
+
+        //TODO: Sort items by getXpRepairRatio (durability per exp point, higher values first) (in 1.14+?)
+        itemsToRepair.sort((a, b) -> 0);
+
+        if(itemsToRepair.isEmpty()) return false;
 
         //Repair items
-        CostHelper repairLimiter = new CostHelper(Math.min(totalDamage, durabilityMaximum));
-        while (!queue.isEmpty() && repairLimiter.getToMax() > 0) {
-            //Dequeue
-            ItemStack itemStack = queue.removeFirst();
-            int toRepair = (int) Math.min(itemStack.getItemDamage(), repairLimiter.getToMax());
-            if (repairLimiter.add(toRepair)) {
-                itemStack.setItemDamage(itemStack.getItemDamage() - toRepair);
-            }
+        int totalDurabilityRepaired = 0;
+        double totalExperienceUsed = 0;
+        for(ItemStack itemStack : itemsToRepair) {
+            // TODO: Replace 2 with getXpRepairRatio later
+            double duraPerExp = MendingCharm.durability_per_xp * 0.5 * 2;
+            // Get durability that can be repaired
+            int toRepair = Math.min(itemStack.getItemDamage(), durabilityMaximum - totalDurabilityRepaired);
+            // Get the amount of experience it would require to repair all that durability, or that we could consume
+            double experienceCost = Math.min(toRepair / duraPerExp, experienceMaximum - totalExperienceUsed);
+            // Get the actual amount of durability we can repair
+            int actuallyRepaired = (int) Math.min(toRepair, experienceCost * duraPerExp);
+            // Get the actual amount of experience it consumed
+            double actualExperience = actuallyRepaired / duraPerExp;
+
+            //Repair the item
+            itemStack.setItemDamage(itemStack.getItemDamage() - actuallyRepaired);
+
+            // Update the totals
+            totalDurabilityRepaired += actuallyRepaired;
+            totalExperienceUsed += actualExperience;
         }
 
-        //Apply the cost of repairs
-        double durabilityRepaired = repairLimiter.getToMin();
-        durabilityRepaired -= durabilityRemainder;
-        int expCost = (int) Math.ceil(getXpFromDurability(durabilityRepaired));
-        ExperienceHelper.addXp(player, -expCost);
-        durabilityRepaired -= getDurabilityFromXp(expCost);
-
-        //Save the excess durability for next time repairs are needed
-        tag.setDouble(TAG_REMAINING_DURABILITY, durabilityRepaired < 0 ? -durabilityRepaired : 0);
+        //Apply the experience cost of repairs
+        double experienceDelta = ExperienceHelper.addXp(player, -totalExperienceUsed, false);
 
         if (MendingCharm.debug)
             player.sendMessage(new TextComponentString(
-                    String.format("%d => %d/%d", expCost, (int) repairLimiter.getToMin(), totalDamage)
+                    String.format("%f-%f=%f (%f) => %d/%d",
+                            startingExperience,
+                            totalExperienceUsed,
+                            ExperienceHelper.getXp(player),
+                            -experienceDelta - totalExperienceUsed,
+                            totalDurabilityRepaired,
+                            totalDamage
+                    )
             ));
 
         return true;
-    }
-
-    @Override
-    public boolean showDurabilityBar(ItemStack stack) {
-        return SponcyConfig.MendingCharm.debug && ItemHelper.getCommonTagHelper(stack).getDouble(TAG_REMAINING_DURABILITY, 0) > 0.001;
-    }
-
-    @Override
-    public double getDurabilityForDisplay(ItemStack stack) {
-        if (MendingCharm.durability_per_xp >= 1.0) {
-            return 1.0d - (ItemHelper.getCommonTagHelper(stack).getDouble(TAG_REMAINING_DURABILITY, 0) / MendingCharm.durability_per_xp);
-        } else {
-            return 1.0d - (ItemHelper.getCommonTagHelper(stack).getDouble(TAG_REMAINING_DURABILITY, 0));
-        }
-    }
-
-    @Override
-    public void addInformation(ItemStack stack, @Nullable World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
-        super.addInformation(stack, worldIn, tooltip, flagIn);
-        if (!SponcyConfig.MendingCharm.debug) return;
-        if (MendingCharm.durability_per_xp >= 1.0) {
-            tooltip.add(String.format("%f/%f", ItemHelper.getCommonTagHelper(stack).getDouble(TAG_REMAINING_DURABILITY, 0), MendingCharm.durability_per_xp));
-        } else {
-            tooltip.add(String.format("%f%%", ItemHelper.getCommonTagHelper(stack).getDouble(TAG_REMAINING_DURABILITY, 0) * 100));
-        }
-        tooltip.add(String.valueOf(isActive(stack)));
     }
 
     @Override

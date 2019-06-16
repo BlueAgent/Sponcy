@@ -18,6 +18,6 @@ public abstract class ItemBase extends Item {
         }
         name = StringHelper.camelCaseToUnderscore(name);
         this.setRegistryName(Sponcy.MOD_ID, name);
-        this.setUnlocalizedName(name);
+        this.setTranslationKey(name);
     }
 }

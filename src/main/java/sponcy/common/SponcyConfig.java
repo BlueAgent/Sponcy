@@ -25,14 +25,18 @@ public class SponcyConfig {
     public static class MendingCharm {
         @Comment("Number of ticks per operation.")
         @RangeInt(min = 1, max = 60 * 20)
-        public static int operation_time = 1;
+        public static int operation_time = 20;
 
         @Comment("Total maximum durability per operation.")
-        @RangeInt(min = 1, max = 1000000)
-        public static int max_durability = 1;
+        @RangeInt(min = 1, max = 100000)
+        public static int max_durability = 100;
+
+        @Comment("Total maximum experience per operation.")
+        @RangeDouble(min = 0, max = Double.POSITIVE_INFINITY)
+        public static double max_experience = Double.POSITIVE_INFINITY;
 
         @Comment("Amount of durability per experience point.\nVanilla Mending repairs 2 durability per experience point.")
-        @RangeDouble(min = 0.1, max = 10000)
+        @RangeDouble(min = 0.1, max = 100000)
         public static double durability_per_xp = 1.8;
 
         @Comment("Only repair items with Mending enchantment placed on them.")

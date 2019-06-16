@@ -7,7 +7,12 @@ import static org.junit.Assert.assertEquals;
 
 public class TestExperienceHelper {
 
-    // Taken from EntityPlayer
+    /**
+     * Gets the max size of the experience bar for the given level
+     * @param level Player level
+     * @return Max size of experience bar
+     * @see net.minecraft.entity.player.EntityPlayer#xpBarCap()
+     */
     public static int xpBarCap(int level) {
         if (level >= 30) {
             return 112 + (level - 30) * 9;

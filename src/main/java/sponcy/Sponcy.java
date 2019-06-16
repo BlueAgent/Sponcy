@@ -15,6 +15,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import sponcy.common.CommonProxy;
+import sponcy.common.capabilities.SponcyCapabilities;
 import sponcy.common.helper.LangHelper;
 import sponcy.common.helper.SQLiteHelper;
 
@@ -97,6 +98,8 @@ public class Sponcy {
         System.out.println(String.format("Version %s", MOD_VERSION));
         System.out.println("Loaded SQLiteJDBC (by Taro L. Saito) at classpath: " + SQLiteHelper.load());
         Sponcy.log = event.getModLog();
+        SponcyCapabilities.registerCapabilities();
+        Sponcy.log.info("Capabilities Loaded");
         proxy.preInit(event);
     }
 

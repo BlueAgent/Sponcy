@@ -22,11 +22,11 @@ public class CommonEvents {
      */
     @SubscribeEvent
     public static void onMissingItemMappingsForOldModID(RegistryEvent.MissingMappings<Item> event) {
-        Sponcy.log.info("Handling missing " + event.getName().getResourcePath() + " from old resource domain: " + OLD_MOD_ID);
+        Sponcy.log.info("Handling missing " + event.getName().getNamespace() + " from old resource domain: " + OLD_MOD_ID);
         event.getAllMappings().stream()
-                .filter(m -> m.key.getResourceDomain().equals(OLD_MOD_ID))
+                .filter(m -> m.key.getNamespace().equals(OLD_MOD_ID))
                 .forEach(m -> {
-                    ResourceLocation newKey = new ResourceLocation(Sponcy.MOD_ID, m.key.getResourcePath());
+                    ResourceLocation newKey = new ResourceLocation(Sponcy.MOD_ID, m.key.getNamespace());
                     Item target = ForgeRegistries.ITEMS.getValue(newKey);
                     if (target != null) {
                         Sponcy.log.info(m.key + " -> " + newKey);
