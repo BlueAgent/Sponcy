@@ -29,7 +29,7 @@ public class SponcyConfig {
 
         @Comment("Total maximum durability per operation.")
         @RangeInt(min = 1, max = 100000)
-        public static int max_durability = 10;
+        public static int max_durability = 5;
 
         @Comment("Total maximum experience per operation.")
         @RangeDouble(min = 0, max = Double.POSITIVE_INFINITY)

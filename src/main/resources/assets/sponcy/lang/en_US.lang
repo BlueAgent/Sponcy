@@ -22,5 +22,6 @@ commands.sc_owner.usage=[id/uuid/name]
 #Items
 item.dev_wand.name=Dev Wand
 item.enchanted_item.name=Enchanted Item
+item.enchanted_item.tooltip=Use any item with matching enchantments
 item.mending_charm.name=Mending Charm
 item.shop_manager.name=Shop Manager

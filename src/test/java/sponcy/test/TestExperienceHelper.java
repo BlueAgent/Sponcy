@@ -9,6 +9,7 @@ public class TestExperienceHelper {
 
     /**
      * Gets the max size of the experience bar for the given level
+     *
      * @param level Player level
      * @return Max size of experience bar
      * @see net.minecraft.entity.player.EntityPlayer#xpBarCap()

@@ -57,7 +57,7 @@ public class ItemMendingCharm extends ItemBase {
 
         }
         // Remove active status
-        if(tag.getInternal().hasKey(TAG_ACTIVE) && tag.getLong(TAG_ACTIVE, 0) < worldIn.getTotalWorldTime()) {
+        if (tag.getInternal().hasKey(TAG_ACTIVE) && tag.getLong(TAG_ACTIVE, 0) < worldIn.getTotalWorldTime()) {
             tag.getInternal().removeTag(TAG_ACTIVE);
         }
     }

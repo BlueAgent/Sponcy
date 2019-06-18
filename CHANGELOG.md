@@ -1,9 +1,10 @@
 ## [0.1.2] - Next
-- Fixed Mending Charm Animation not stopping when outside of inventory (thanks to diesieben07)
-- Mending Charm now repairs the most percent damaged item first
-- Implemented Fractional Experience capability for the player
-- Fix addEnchantment when containing existing enchantments
 - Updated Forge, Mappings, JEI and Resource Pack format
+- Mending Charm now repairs the most percent damaged item first
+- Fixed addEnchantment when containing existing enchantments
+- Fixed Mending Charm Animation not stopping when outside of inventory (thanks to diesieben07)
+- Implemented Fractional Experience capability for the player
+- Added tooltip to Enchanted Item placeholder
 
 ## [0.1.1] - 2018-07-29
 - Now has a Changelog!
