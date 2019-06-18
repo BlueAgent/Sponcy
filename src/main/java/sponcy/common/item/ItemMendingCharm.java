@@ -1,10 +1,12 @@
 package sponcy.common.item;
 
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Enchantments;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.World;
@@ -16,6 +18,8 @@ import sponcy.common.helper.ItemHelper;
 import sponcy.common.helper.NBTHelper;
 
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.function.ToDoubleFunction;
 
 
 /**
@@ -23,29 +27,39 @@ import java.util.ArrayList;
  */
 public class ItemMendingCharm extends ItemBase {
 
-    public static final String TAG_REMAINING_DURABILITY = "rem";
-    public static final String TAG_ACTIVE = "active";
+    public static final String TAG_ACTIVE = "active_till";
     public static final int TICKS_ACTIVE = 20;
 
     public ItemMendingCharm() {
         setMaxStackSize(1);
-        addPropertyOverride(new ResourceLocation(Sponcy.MOD_ID, "active"), (stack, world, entity) -> isActive(stack) ? 1 : 0);
+        addPropertyOverride(new ResourceLocation(Sponcy.MOD_ID, "active"), (stack, world, entity) -> isActive(stack, world, entity) ? 1 : 0);
     }
 
-    private boolean isActive(ItemStack stack) {
-        return ItemHelper.getCommonTagHelper(stack).getInteger(TAG_ACTIVE, 0) > 0;
+    private boolean isActive(ItemStack stack, World world, EntityLivingBase clientPlayer) {
+        if (world == null) {
+            if (clientPlayer == null) return false;
+            world = clientPlayer.world;
+        }
+        NBTTagCompound tag = stack.getTagCompound();
+        if (tag == null || !tag.hasKey(TAG_ACTIVE)) return false;
+        return tag.getLong(TAG_ACTIVE) > world.getTotalWorldTime();
     }
 
     @Override
     public void onUpdate(ItemStack stack, World worldIn, Entity entityIn, int itemSlot, boolean isSelected) {
         if (worldIn.isRemote) return;
         if (!(entityIn instanceof EntityPlayer)) return;
-        NBTHelper tag = ItemHelper.getCommonTagHelper(stack);
-        boolean didRepair = false;
+        NBTHelper tag = ItemHelper.getOrCreateTagHelper(stack);
+        // Repair
         if (worldIn.getTotalWorldTime() % MendingCharm.operation_time == 0) {
-            didRepair = doRepairs((EntityPlayer) entityIn, tag);
+            if (doRepairs((EntityPlayer) entityIn, tag))
+                tag.setLong(TAG_ACTIVE, worldIn.getTotalWorldTime() + TICKS_ACTIVE);
+
         }
-        tag.setInteger(TAG_ACTIVE, Math.max(0, didRepair ? TICKS_ACTIVE : tag.getInteger(TAG_ACTIVE, 0) - 1));
+        // Remove active status
+        if(tag.getInternal().hasKey(TAG_ACTIVE) && tag.getLong(TAG_ACTIVE, 0) < worldIn.getTotalWorldTime()) {
+            tag.getInternal().removeTag(TAG_ACTIVE);
+        }
     }
 
     public boolean doRepairs(EntityPlayer player, NBTHelper tag) {
@@ -63,7 +77,7 @@ public class ItemMendingCharm extends ItemBase {
             //Check if it has Mending
             if (MendingCharm.requires_mending && EnchantHelper.getEnchantmentLevel(itemStack, Enchantments.MENDING) == 0)
                 continue;
-            //TODO: Instantly repair getXpRepairRatio == Float.INFINITY but don't queue up
+            //TODO: Instantly repair getXpRepairRatio == Float.INFINITY but don't queue up (Trigger animation though)
             //Enqueue
             itemsToRepair.add(itemStack);
             totalDamage += itemStack.getItemDamage();
@@ -76,7 +90,12 @@ public class ItemMendingCharm extends ItemBase {
         if (experienceMaximum <= 0) return false;
 
         //TODO: Sort items by getXpRepairRatio (durability per exp point, higher values first) (in 1.14+?)
-        itemsToRepair.sort((a, b) -> 0);
+        itemsToRepair.sort(Comparator
+                .comparingDouble((ToDoubleFunction<ItemStack>) value ->
+                        (double) value.getItemDamage() / value.getMaxDamage() // TODO: Maybe multiply by getXpRepairRatio?
+                )
+                .reversed()
+        );
 
         if (itemsToRepair.isEmpty()) return false;
 
@@ -106,17 +125,21 @@ public class ItemMendingCharm extends ItemBase {
         //Apply the experience cost of repairs
         double experienceDelta = ExperienceHelper.addXp(player, -totalExperienceUsed, false);
 
-        if (MendingCharm.debug)
+        if (MendingCharm.debug) {
+            double error = -experienceDelta - totalExperienceUsed;
+            char sign = error > 0 ? '+' : error < 0 ? '-' : '=';
             player.sendMessage(new TextComponentString(
-                    String.format("%f-%f=%f (%f) => %d/%d",
+                    String.format("%f-%f=%f (%s%f) => %d/%d",
                             startingExperience,
                             totalExperienceUsed,
                             ExperienceHelper.getXp(player),
-                            -experienceDelta - totalExperienceUsed,
+                            sign,
+                            error,
                             totalDurabilityRepaired,
                             totalDamage
                     )
             ));
+        }
 
         return true;
     }

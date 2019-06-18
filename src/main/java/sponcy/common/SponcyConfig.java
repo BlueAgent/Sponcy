@@ -25,11 +25,11 @@ public class SponcyConfig {
     public static class MendingCharm {
         @Comment("Number of ticks per operation.")
         @RangeInt(min = 1, max = 60 * 20)
-        public static int operation_time = 20;
+        public static int operation_time = 1;
 
         @Comment("Total maximum durability per operation.")
         @RangeInt(min = 1, max = 100000)
-        public static int max_durability = 100;
+        public static int max_durability = 10;
 
         @Comment("Total maximum experience per operation.")
         @RangeDouble(min = 0, max = Double.POSITIVE_INFINITY)

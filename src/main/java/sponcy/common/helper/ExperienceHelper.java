@@ -9,7 +9,7 @@ import sponcy.common.capabilities.expfrac.IExperienceFractional;
 public class ExperienceHelper {
 
     //Solve: (9 * n * n - 325 * n + 4440) / 2 = 2^31 - 1
-    //Result: 1/18 (325 + Sqrt[154618768369])
+    //Result: 1/18 (325 + Sqrt[154618768369]) ~= 21863.385053916877105759
     //     ~= 21863
     public static final int MAX_LEVEL = 21863;
     public static final int MAX_LEVEL_EXP = xpAtLevel(MAX_LEVEL); //2147407943
