@@ -1,10 +1,12 @@
 ## [0.1.2] - Next
 - Updated Forge, Mappings, JEI and Resource Pack format
-- Mending Charm now repairs the most percent damaged item first
+- Mending Charm now repairs the cheapest to repair item followed by the most percent damaged item first
 - Fixed addEnchantment when containing existing enchantments
 - Fixed Mending Charm Animation not stopping when outside of inventory (thanks to diesieben07)
 - Implemented Fractional Experience capability for the player
 - Added tooltip to Enchanted Item placeholder
+- Changed Mending Charm to repair 2.5 instead of 1.8 durability per xp (vanilla is 2 per xp)
+- Changed Mending Charm max durability repaired to MAX_INT instead of 5
 
 ## [0.1.1] - 2018-07-29
 - Now has a Changelog!
@@ -26,7 +28,6 @@
 - Added SQLite wrapper (bundled with the mod)
 - Added Shop Manager (doesn't do anything at the moment) and the start of a shop framework that uses a database backend.
 - Added Dev Tool (doesn't do anything, used to test code snippets)
-
 
 ## [0.0.2] - 2017-02-28
 - Changed: Mending Charm no longer wastes experience (configurable) also added debug messages (configurable)

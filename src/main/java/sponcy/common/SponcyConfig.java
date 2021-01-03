@@ -28,16 +28,16 @@ public class SponcyConfig {
         public static int operation_time = 1;
 
         @Comment("Total maximum durability per operation.")
-        @RangeInt(min = 1, max = 100000)
-        public static int max_durability = 5;
+        @RangeInt(min = 1)
+        public static int max_durability = Integer.MAX_VALUE;
 
-        @Comment("Total maximum experience per operation.")
+        @Comment("Total maximum experience per operation. Note that changing this is not recommended since it might make some items not repairable if `max_experience < (1 / getXpRepairRatio)` of an item). Recommended to change operation time and/or maximum durability instead.")
         @RangeDouble(min = 0, max = Double.POSITIVE_INFINITY)
         public static double max_experience = Double.POSITIVE_INFINITY;
 
         @Comment("Amount of durability per experience point.\nVanilla Mending repairs 2 durability per experience point.")
         @RangeDouble(min = 0.1, max = 100000)
-        public static double durability_per_xp = 1.8;
+        public static double durability_per_xp = 2.5;
 
         @Comment("Only repair items with Mending enchantment placed on them.")
         public static boolean requires_mending = true;

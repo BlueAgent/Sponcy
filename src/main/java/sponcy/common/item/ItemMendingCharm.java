@@ -67,18 +67,24 @@ public class ItemMendingCharm extends ItemBase {
         int totalDamage = 0;
         ArrayList<ItemStack> itemsToRepair = new ArrayList<>(player.inventoryContainer.inventorySlots.size());
         for (Slot slot : player.inventoryContainer.inventorySlots) {
-            //Exclude the crafting slots
+            // Exclude the crafting slots
             if (slot.slotNumber < 5) continue;
             ItemStack itemStack = slot.getStack();
             if (itemStack.isEmpty()) continue;
-            //Make sure it is using metadata for durability
+            // Make sure it is using metadata for durability
             if (!itemStack.isItemDamaged()) continue;
-            //TODO: Filter out getXpRepairRatio <= 0 durability per xp (unrepairable)
-            //Check if it has Mending
+            // Filter out getXpRepairRatio <= 0 durability per xp (unrepairable)
+            float xpRepairRatio = itemStack.getItem().getXpRepairRatio(itemStack);
+            if (xpRepairRatio <= 0) continue;
+            // Check if it has Mending
             if (MendingCharm.requires_mending && EnchantHelper.getEnchantmentLevel(itemStack, Enchantments.MENDING) == 0)
                 continue;
-            //TODO: Instantly repair getXpRepairRatio == Float.INFINITY but don't queue up (Trigger animation though)
-            //Enqueue
+            // Instantly repair when getXpRepairRatio == Float.INFINITY but don't queue up (Trigger animation though)
+            if (xpRepairRatio == Float.POSITIVE_INFINITY) {
+                itemStack.setItemDamage(0);
+                continue;
+            }
+
             itemsToRepair.add(itemStack);
             totalDamage += itemStack.getItemDamage();
         }
@@ -89,22 +95,32 @@ public class ItemMendingCharm extends ItemBase {
         double experienceMaximum = Math.min(MendingCharm.max_experience, startingExperience);
         if (experienceMaximum <= 0) return false;
 
-        //TODO: Sort items by getXpRepairRatio (durability per exp point, higher values first) (in 1.14+?)
-        itemsToRepair.sort(Comparator
-                .comparingDouble((ToDoubleFunction<ItemStack>) value ->
-                        (double) value.getItemDamage() / value.getMaxDamage() // TODO: Maybe multiply by getXpRepairRatio?
-                )
-                .reversed()
+        // Remove anything that can't be repaired ignoring ordering
+        double repairRatioMinimum = MendingCharm.durability_per_xp / experienceMaximum;
+        itemsToRepair.removeIf(
+                stack -> stack.getItem().getXpRepairRatio(stack) < repairRatioMinimum
         );
 
         if (itemsToRepair.isEmpty()) return false;
+
+        // Sort items by getXpRepairRatio (durability per exp point, higher values first)
+        // TODO: Consider randomly repairing instead of sorting?
+        itemsToRepair.sort(Comparator
+                .<ItemStack>comparingDouble(stack ->
+                    stack.getItem().getXpRepairRatio(stack)
+                )
+                .thenComparingDouble(stack ->
+                        (double) stack.getItemDamage() / stack.getMaxDamage() // TODO: Maybe multiply by getXpRepairRatio?
+                )
+                .reversed()
+        );
 
         //Repair items
         int totalDurabilityRepaired = 0;
         double totalExperienceUsed = 0;
         for (ItemStack itemStack : itemsToRepair) {
-            // TODO: Replace 2 with getXpRepairRatio later
-            double duraPerExp = MendingCharm.durability_per_xp * 0.5 * 2;
+            // Work out the durability per xp, need to multiply by 0.5 since default for getXpRepairRatio is 2
+            double duraPerExp = MendingCharm.durability_per_xp * 0.5 * itemStack.getItem().getXpRepairRatio(itemStack);
             // Get durability that can be repaired
             int toRepair = Math.min(itemStack.getItemDamage(), durabilityMaximum - totalDurabilityRepaired);
             // Get the amount of experience it would require to repair all that durability, or that we could consume
