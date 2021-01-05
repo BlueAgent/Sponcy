@@ -1,86 +1,96 @@
-buildscript {
-    repositories {
-        jcenter()
-        maven { url = "http://files.minecraftforge.net/maven" }
-    }
-    dependencies {
-        classpath 'net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT'
-    }
-
-}
-
 plugins {
-    id "com.github.johnrengelman.shadow" version "1.2.4"
+    id 'com.github.johnrengelman.shadow' version '5.2.0'
+    id 'net.minecraftforge.gradle' version '3.0.189'
 }
 
-apply plugin: 'net.minecraftforge.gradle.forge'
-
-repositories {
-    maven {
-        // location of the maven that hosts JEI files
-        url = "http://dvs1.progwml6.com/files/maven"
-    }
-}
-
-version = "${mod_version}"
-group = archivesBaseName = "${mod_id}"
+version = project.mod_version
+group = project.mod_id
+archivesBaseName = "${project.mod_id}-${mc_version}"
 sourceCompatibility = targetCompatibility = JavaVersion.VERSION_1_8
 
 minecraft {
-    version = "${mc_version}-${forge_version}"
-    runDir = "run"
+    mappings channel: project.mappings_channel, version: project.mappings_version
 
-    mappings = "${mappings_version}"
-    makeObfSourceJar = false
+    runs {
+        client {
+            workingDirectory project.file('run')
+            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
+            property 'forge.logging.console.level', 'debug'
+        }
+        server {
+            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
+            property 'forge.logging.console.level', 'debug'
+        }
+    }
 
-    replaceIn "src/main/java/sponcy/Sponcy.java"
-    replace "MOD_VERSION = \"99999.999.999\"", "MOD_VERSION = \"${mod_version}\""
-    replace "MC_VERSION = \"\"", "MC_VERSION = \"[${mc_version}]\""
-    replace "DEPENDENCIES = \"\"", "DEPENDENCIES = \"required-after:forge@[${forge_version},)\""
+//    replaceIn "src/main/java/sponcy/Sponcy.java"
+//    replace "MOD_VERSION = \"99999.999.999\"", "MOD_VERSION = \"${mod_version}\""
+//    replace "MC_VERSION = \"\"", "MC_VERSION = \"[${mc_version}]\""
+//    replace "DEPENDENCIES = \"\"", "DEPENDENCIES = \"required-after:forge@[${forge_version},)\""
+}
+
+repositories {
+    maven {
+        name 'Forge'
+        url 'https://files.minecraftforge.net/maven'
+        content {
+            includeGroup 'net.minecraftforge'
+        }
+    }
+    maven {
+        name 'progwml6'
+        url 'https://dvs1.progwml6.com/files/maven'
+        content {
+            includeGroup 'mezz.jei'
+        }
+    }
 }
 
 dependencies {
-    //compile "some.group:artifact:version:classifier"
-    //compile "some.group:artifact:version"
-    //compile 'com.mod-buildcraft:buildcraft:6.0.8:dev'  // adds buildcraft to the dev env
-    //compile 'com.googlecode.efficient-java-matrix-library:ejml:0.24' // adds ejml to the dev env
-    //deobfCompile 'com.mod-buildcraft:buildcraft:6.0.8:dev'
-    //deobfProvided 'com.mod-buildcraft:buildcraft:6.0.8:dev'
+    minecraft "net.minecraftforge:forge:${mc_version}-${forge_version}"
 
-    testCompile "junit:junit:${junit_version}"
+    testImplementation "junit:junit:${junit_version}"
 
-    // compile against the JEI API
-    deobfCompile "mezz.jei:jei_${mc_version}:${jei_version}:api"
-    // at runtime, use the full JEI jar
-    runtime "mezz.jei:jei_${mc_version}:${jei_version}"
+    compileOnly fg.deobf("mezz.jei:jei_${mc_version}:${jei_version}:api")
+    runtimeOnly fg.deobf("mezz.jei:jei_${mc_version}:${jei_version}")
 
     //SQLiteJDBC
     compile "org.xerial:sqlite-jdbc:${sqlite_jdbc_version}"
 }
 
-processResources
-{
-    // this will ensure that this task is redone when the versions change.
-    inputs.property "version", project.version
-    inputs.property "mcversion", project.minecraft.version
+jar {
+    manifest {
+        attributes([
+            'Specification-Title': project.name,
+            'Specification-Vendor': project.vendor,
+            'Specification-Version': '1',
+            'Implementation-Title': project.group,
+            'Implementation-Version': project.version,
+            'Implementation-Vendor': project.vendor,
+        ])
+    }
+}
 
-    // replace stuff in mcmod.info, nothing else
+processResources {
+    inputs.property 'version', project.version
+    inputs.property 'mc_version', project.mc_version
+
     from(sourceSets.main.resources.srcDirs) {
         include 'mcmod.info'
-                
-        // replace version and mcversion
-        expand 'version':project.version, 'mcversion':project.minecraft.version
+        expand([
+            'version': project.version,
+            'mc_version': project.mc_version,
+        ])
     }
-        
-    // copy everything else, thats not the mcmod.info
+
     from(sourceSets.main.resources.srcDirs) {
         exclude 'mcmod.info'
     }
 }
 
 shadowJar {
-    classifier = ""
-    exclude "dummyThing"
+    classifier = ''
+    exclude 'dummyThing'
 
     dependencies {
         include(dependency("org.xerial:sqlite-jdbc:${sqlite_jdbc_version}"))
@@ -88,9 +98,7 @@ shadowJar {
 }
 
 reobf {
-    shadowJar {
-        mappingType = "SEARGE"
-    }
+    shadowJar {}
 }
 
-tasks.reobfShadowJar.mustRunAfter shadowJar
+build.dependsOn(shadowJar)

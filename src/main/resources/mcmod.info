@@ -4,7 +4,7 @@
   "name": "Sponcy",
   "description": "For learning how to mod Minecraft, and for testing new ideas.",
   "version": "${version}",
-  "mcversion": "${mcversion}",
+  "mcversion": "${mc_version}",
   "url": "https://github.com/BlueAgent/Sponcy",
   "updateUrl": "",
   "authorList": ["BlueAgent"],
