@@ -3,6 +3,21 @@ plugins {
     id 'net.minecraftforge.gradle' version '3.0.189'
 }
 
+sourceSets {
+    main {
+        java {
+            exclude 'sponcy/Sponcy.java'
+        }
+    }
+    replacements {
+        java {
+            srcDirs = ['src/main/java']
+            include 'sponcy/Sponcy.java'
+        }
+        resources.srcDirs = []
+    }
+}
+
 version = project.mod_version
 group = project.mod_id
 archivesBaseName = "${project.mod_id}-${mc_version}"
@@ -22,11 +37,6 @@ minecraft {
             property 'forge.logging.console.level', 'debug'
         }
     }
-
-//    replaceIn "src/main/java/sponcy/Sponcy.java"
-//    replace "MOD_VERSION = \"99999.999.999\"", "MOD_VERSION = \"${mod_version}\""
-//    replace "MC_VERSION = \"\"", "MC_VERSION = \"[${mc_version}]\""
-//    replace "DEPENDENCIES = \"\"", "DEPENDENCIES = \"required-after:forge@[${forge_version},)\""
 }
 
 repositories {
@@ -69,6 +79,27 @@ jar {
             'Implementation-Vendor': project.vendor,
         ])
     }
+}
+
+task processReplacements(type: Sync) {
+    inputs.property 'mod_version', project.mod_version
+    inputs.property 'mc_version', project.mc_version
+    inputs.property 'forge_version', project.forge_version
+    inputs.files sourceSets.replacements.java
+
+    from(sourceSets.replacements.java) {
+        filter { line -> line
+                .replace("MOD_VERSION = \"99999.999.999\"", "MOD_VERSION = \"${mod_version}\"")
+                .replace("MC_VERSION = \"\"", "MC_VERSION = \"[${mc_version}]\"")
+                .replace("DEPENDENCIES = \"\"", "DEPENDENCIES = \"required-after:forge@[${forge_version},)\"")
+        }
+    }
+
+    into "${project.buildDir}/src"
+}
+
+compileJava {
+    source += processReplacements.outputs
 }
 
 processResources {
