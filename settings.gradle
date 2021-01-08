@@ -1,19 +1,4 @@
-pluginManagement {
-    resolutionStrategy {
-        eachPlugin {
-            if (requested.id.id == 'net.minecraftforge.gradle') {
-                useModule("net.minecraftforge.gradle:ForgeGradle:${requested.version}")
-            }
-        }
-    }
-    repositories {
-        maven {
-            name 'Forge'
-            url 'https://files.minecraftforge.net/maven'
-            content {
-                includeGroup 'net.minecraftforge.gradle'
-            }
-        }
-        gradlePluginPortal()
-    }
-}
+rootProject.name = 'sponcy'
+
+include 'sponcy-all'
+include 'sponcy-common'

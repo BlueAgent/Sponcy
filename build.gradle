@@ -1,0 +1,43 @@
+buildscript {
+    repositories {
+        maven {
+            name 'forge'
+            url 'https://files.minecraftforge.net/maven'
+            content {
+                includeGroup 'net.minecraftforge.gradle'
+                includeGroup 'net.minecraftforge'
+            }
+        }
+        jcenter()
+    }
+    dependencies {
+        classpath 'net.minecraftforge.gradle:ForgeGradle:3.+'
+    }
+}
+
+allprojects {
+    group = 'sponcy'
+    version = project.mod_version
+}
+
+subprojects {
+    apply plugin: 'net.minecraftforge.gradle'
+
+    minecraft {
+        mappings channel: "${project.mappings_channel}", version: "${project.mappings_version}"
+    }
+
+    repositories {
+        maven {
+            name 'progwml6'
+            url 'https://dvs1.progwml6.com/files/maven'
+            content {
+                includeGroup 'mezz.jei'
+            }
+        }
+    }
+
+    dependencies {
+        minecraft "net.minecraftforge:forge:${mc_version}-${forge_version}"
+    }
+}

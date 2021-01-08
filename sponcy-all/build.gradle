@@ -1,0 +1,80 @@
+plugins {
+    id 'com.github.johnrengelman.shadow' version '5.2.0'
+}
+
+archivesBaseName = "${project.mod_id}-${project.mc_version}"
+
+minecraft {
+    accessTransformer fileTree("${buildDir}/extractATs") { include '**/*_at.cfg' }.collect() as File[]
+    runs {
+        client {
+            workingDirectory project.file('run')
+            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
+            property 'forge.logging.console.level', 'debug'
+            args '--username', 'Dev'
+
+            mods {
+                "${project.mod_id}" {
+                    source sourceSets.main
+                }
+            }
+        }
+        server {
+            workingDirectory project.file('run')
+            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
+            property 'forge.logging.console.level', 'debug'
+            mods {
+                "${project.mod_id}" {
+                    source sourceSets.main
+                }
+            }
+        }
+    }
+}
+
+configurations {
+    hasATs
+}
+
+dependencies {
+    implementation project(path: ':sponcy-common', configuration: 'shadow')
+
+    runtimeOnly fg.deobf("mezz.jei:jei_${mc_version}:${jei_version}")
+    hasATs "mezz.jei:jei_${mc_version}:${jei_version}"
+}
+
+task extractATs(type: Sync) {
+    dependsOn configurations.hasATs
+
+    from configurations.hasATs.collect { zipTree(it) }
+    include 'META-INF/*_at.cfg'
+    into "${buildDir}/extractATs"
+}
+
+compileJava.finalizedBy(extractATs)
+
+jar {
+    manifest {
+        attributes([
+                'Specification-Title'   : project.name,
+                'Specification-Vendor'  : project.vendor,
+                'Specification-Version' : '1',
+                'Implementation-Title'  : project.group,
+                'Implementation-Version': project.version,
+                'Implementation-Vendor' : project.vendor,
+        ])
+    }
+}
+
+shadowJar {
+    classifier = ''
+    dependencies {
+        include(project(path: ':sponcy-common', configuration: 'shadow'))
+    }
+}
+
+reobf {
+    shadowJar {}
+}
+
+build.dependsOn(reobfShadowJar)

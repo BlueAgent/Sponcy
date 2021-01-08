@@ -1,103 +1,31 @@
 plugins {
-    id 'net.minecraftforge.gradle' version '3.0.189'
     id 'com.github.johnrengelman.shadow' version '5.2.0'
 }
 
 sourceSets {
-//    main {
-//        java {
-//            exclude 'sponcy/Sponcy.java'
-//        }
-//    }
+    main {
+        java {
+            exclude 'sponcy/Sponcy.java'
+        }
+    }
     replacements {
         java {
-//            srcDirs = ['src/main/java']
-//            include 'sponcy/Sponcy.java'
+            srcDirs = ['src/main/java']
+            include 'sponcy/Sponcy.java'
         }
         resources.srcDirs = []
     }
 }
 
-version = project.mod_version
-group = project.mod_id
-archivesBaseName = "${project.mod_id}-${project.mc_version}"
-sourceCompatibility = targetCompatibility = JavaVersion.VERSION_1_8
-
 minecraft {
-    mappings channel: "${project.mappings_channel}", version: "${project.mappings_version}"
     accessTransformer file('src/main/resources/META-INF/accesstransformer.cfg')
-    accessTransformer fileTree('build/extractATs') { include '**/*_at.cfg' }.collect() as File[]
-
-    runs {
-        client {
-            workingDirectory project.file('run')
-            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
-            property 'forge.logging.console.level', 'debug'
-            args '--username', 'SponcyDev'
-            mods {
-                sponcy {
-                    source sourceSets.main
-                }
-            }
-        }
-        server {
-            workingDirectory project.file('run')
-            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
-            property 'forge.logging.console.level', 'debug'
-            mods {
-                sponcy {
-                    source sourceSets.main
-                }
-            }
-        }
-    }
-}
-
-repositories {
-    maven {
-        name 'Forge'
-        url 'https://files.minecraftforge.net/maven'
-        content {
-            includeGroup 'net.minecraftforge'
-        }
-    }
-    maven {
-        name 'progwml6'
-        url 'https://dvs1.progwml6.com/files/maven'
-        content {
-            includeGroup 'mezz.jei'
-        }
-    }
-}
-
-configurations {
-    hasATs
 }
 
 dependencies {
-    minecraft "net.minecraftforge:forge:${mc_version}-${forge_version}"
-
     testImplementation "junit:junit:${junit_version}"
 
-    compileOnly fg.deobf("mezz.jei:jei_${mc_version}:${jei_version}:api")
-    runtimeOnly fg.deobf("mezz.jei:jei_${mc_version}:${jei_version}")
-    hasATs "mezz.jei:jei_${mc_version}:${jei_version}"
-
     //SQLiteJDBC
-    compile "org.xerial:sqlite-jdbc:${sqlite_jdbc_version}"
-}
-
-jar {
-    manifest {
-        attributes([
-            'Specification-Title': project.name,
-            'Specification-Vendor': project.vendor,
-            'Specification-Version': '1',
-            'Implementation-Title': project.group,
-            'Implementation-Version': project.version,
-            'Implementation-Vendor': project.vendor,
-        ])
-    }
+    implementation "org.xerial:sqlite-jdbc:${sqlite_jdbc_version}"
 }
 
 task processReplacements(type: Sync) {
@@ -117,16 +45,7 @@ task processReplacements(type: Sync) {
     into "${project.buildDir}/src"
 }
 
-task extractATs(type: Sync) {
-    dependsOn configurations.hasATs
-
-    from configurations.hasATs.collect { zipTree(it) }
-    include 'META-INF/*_at.cfg'
-    into "$buildDir/extractATs"
-}
-
 compileJava {
-    dependsOn extractATs
     source += processReplacements.outputs
 }
 
@@ -147,8 +66,6 @@ processResources {
     }
 }
 
-jar.finalizedBy('reobfJar')
-
 shadowJar {
     classifier = ''
     exclude 'dummyThing'
@@ -156,10 +73,12 @@ shadowJar {
     dependencies {
         include(dependency("org.xerial:sqlite-jdbc:${sqlite_jdbc_version}"))
     }
-}
 
-reobf {
-    shadowJar {}
+    artifacts {
+        shadow(tasks.shadowJar.archiveFile) {
+            builtBy shadowJar
+        }
+    }
 }
 
 build.dependsOn(shadowJar)
