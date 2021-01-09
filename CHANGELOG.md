@@ -1,4 +1,4 @@
-## [0.1.2] - Next
+## [0.1.2] - 2021-01-09
 - Updated Forge, Mappings, JEI and Resource Pack format
 - Mending Charm now repairs the cheapest to repair item followed by the most percent damaged item first
 - Fixed addEnchantment when containing existing enchantments
